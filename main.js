@@ -395,3 +395,256 @@
     })();
   })();
 })();
+
+/* ======================================================================
+   WORMHOLE ROUTE TRANSITION
+   A two-pass WebGL portal between routes: pass 1 renders an animated
+   noise/starfield tunnel to a texture (render-to-texture); pass 2 warps
+   that texture on a single full-screen quad — radial distortion +
+   chromatic aberration + a spiral UV twist toward a vanishing centre —
+   driven by one normalised progress value (0->1). The outgoing page is
+   pulled into the centre (live transform synced to the same progress);
+   the swap happens under the opaque "deep" phase; the incoming page
+   emerges outward. Falls back to a quick fade where WebGL is missing and
+   is fully disabled under prefers-reduced-motion. ~840ms, eased. Mobile-
+   safe (DPR-capped, no pointer needed). This is an MPA, so the in-phase
+   and out-phase are handed off across the navigation via sessionStorage.
+   ====================================================================== */
+(function () {
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var KEY = "wh-nav";
+  var DUR_IN = 380, DUR_OUT = 460;
+  var busy = false, glState, ACC = [0.69, 0.12, 0.18];
+
+  var VSRC = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos,0.0,1.0);}";
+  var SCENE_FS =
+    "precision mediump float;uniform vec2 uRes;uniform float uTime;" +
+    "uniform vec3 uAccent;uniform vec3 uVoid;" +
+    "float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}" +
+    "float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);" +
+    "float a=hash(i),b=hash(i+vec2(1.0,0.0)),c=hash(i+vec2(0.0,1.0)),d=hash(i+vec2(1.0,1.0));" +
+    "return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}" +
+    "void main(){vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;" +
+    "float r=length(uv)+1e-4;float a=atan(uv.y,uv.x);" +
+    "float depth=0.35/r+uTime*0.6;vec2 tc=vec2(a*1.2732,depth);" +
+    "float n=noise(tc*3.0)*0.6+noise(tc*7.0)*0.3;" +
+    "float cell=hash(floor(vec2(a*3.5,depth*1.5)));" +
+    "float star=smoothstep(0.93,1.0,cell)*smoothstep(0.0,0.6,fract(depth*0.7+cell));" +
+    "float glow=smoothstep(0.55,0.0,r);" +
+    "vec3 col=mix(uVoid,uAccent,clamp(n*0.6+glow*0.7,0.0,1.0));" +
+    "col+=vec3(1.0,0.95,0.9)*star*1.3;gl_FragColor=vec4(col,1.0);}";
+  var WARP_FS =
+    "precision mediump float;uniform sampler2D uScene;uniform vec2 uRes;uniform float uProgress;" +
+    "void main(){vec2 c=(gl_FragCoord.xy-0.5*uRes)/uRes.y;" +
+    "float r=length(c)+1e-4;float ang=atan(c.y,c.x);" +
+    "float inten=1.0-abs(uProgress*2.0-1.0);float dir=uProgress<0.5?1.0:-1.0;" +
+    "ang+=(0.55/(r+0.12))*inten*dir;" +
+    "float rr=r*(1.0-0.55*inten*clamp(1.0-r,0.0,1.0));" +
+    "vec2 wc=vec2(cos(ang),sin(ang))*rr;" +
+    "vec2 uv=vec2(wc.x*uRes.y/uRes.x,wc.y)+0.5;" +
+    "vec2 dv=c/r;float ca=0.018*inten;" +
+    "float R=texture2D(uScene,uv+dv*ca).r;" +
+    "float G=texture2D(uScene,uv).g;" +
+    "float B=texture2D(uScene,uv-dv*ca).b;" +
+    "float alpha=smoothstep(0.0,0.32,inten);" +
+    "gl_FragColor=vec4(vec3(R,G,B)*alpha,alpha);}";
+
+  function hexRGB(h) {
+    h = (h || "").trim().replace("#", "");
+    if (h.length === 3) h = h[0]+h[0] + h[1]+h[1] + h[2]+h[2];
+    var n = parseInt(h, 16);
+    if (isNaN(n)) return [0.69, 0.12, 0.18];
+    return [((n>>16)&255)/255, ((n>>8)&255)/255, (n&255)/255];
+  }
+  function readAcc() {
+    try { ACC = hexRGB(getComputedStyle(document.documentElement).getPropertyValue("--crimson")); }
+    catch (e) {}
+  }
+  function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+  function animateHalf(dur, onFrame, done) {
+    var start;
+    function step(ts) {
+      if (start === undefined) start = ts;
+      var t = Math.min((ts - start)/dur, 1);
+      onFrame(ease(t));
+      if (t < 1) requestAnimationFrame(step); else if (done) done();
+    }
+    requestAnimationFrame(step);
+  }
+
+  function ensureGL() {
+    if (glState !== undefined) return !!glState;
+    var canvas = document.createElement("canvas");
+    canvas.className = "wh-canvas";
+    canvas.setAttribute("aria-hidden", "true");
+    canvas.style.display = "none";
+    var gl = canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false })
+          || canvas.getContext("experimental-webgl");
+    if (!gl) { glState = null; return false; }
+    function sh(t, src) { var s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+    function prog(vs, fs) {
+      var p = gl.createProgram();
+      gl.attachShader(p, sh(gl.VERTEX_SHADER, vs));
+      gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs));
+      gl.linkProgram(p);
+      return gl.getProgramParameter(p, gl.LINK_STATUS) ? p : null;
+    }
+    var sceneP = prog(VSRC, SCENE_FS), warpP = prog(VSRC, WARP_FS);
+    if (!sceneP || !warpP) { glState = null; return false; }
+    var quad = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    gl.bufferData(gl.ARRAY_BUFFER,
+      new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+    glState = {
+      gl: gl, canvas: canvas, sceneP: sceneP, warpP: warpP, quad: quad,
+      tex: gl.createTexture(), fbo: gl.createFramebuffer(), w: 0, h: 0,
+      loc: {
+        sPos: gl.getAttribLocation(sceneP, "aPos"), sRes: gl.getUniformLocation(sceneP, "uRes"),
+        sTime: gl.getUniformLocation(sceneP, "uTime"), sAcc: gl.getUniformLocation(sceneP, "uAccent"),
+        sVoid: gl.getUniformLocation(sceneP, "uVoid"),
+        wPos: gl.getAttribLocation(warpP, "aPos"), wRes: gl.getUniformLocation(warpP, "uRes"),
+        wScene: gl.getUniformLocation(warpP, "uScene"), wProg: gl.getUniformLocation(warpP, "uProgress")
+      }
+    };
+    resizeGL();
+    return true;
+  }
+  function resizeGL() {
+    if (!glState) return;
+    var gl = glState.gl, dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    var w = Math.max(1, Math.round(window.innerWidth*dpr));
+    var h = Math.max(1, Math.round(window.innerHeight*dpr));
+    glState.canvas.width = w; glState.canvas.height = h; glState.w = w; glState.h = h;
+    gl.bindTexture(gl.TEXTURE_2D, glState.tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, glState.fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glState.tex, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  }
+  function renderGL(p) {
+    var s = glState, gl = s.gl, w = s.w, h = s.h, t = performance.now()/1000, L = s.loc;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, s.fbo);          // pass 1: tunnel -> texture
+    gl.viewport(0, 0, w, h);
+    gl.disable(gl.BLEND);
+    gl.useProgram(s.sceneP);
+    gl.bindBuffer(gl.ARRAY_BUFFER, s.quad);
+    gl.enableVertexAttribArray(L.sPos); gl.vertexAttribPointer(L.sPos, 2, gl.FLOAT, false, 0, 0);
+    gl.uniform2f(L.sRes, w, h); gl.uniform1f(L.sTime, t);
+    gl.uniform3f(L.sAcc, ACC[0], ACC[1], ACC[2]); gl.uniform3f(L.sVoid, 0.039, 0.043, 0.051);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);           // pass 2: warp -> screen
+    gl.viewport(0, 0, w, h);
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.useProgram(s.warpP);
+    gl.bindBuffer(gl.ARRAY_BUFFER, s.quad);
+    gl.enableVertexAttribArray(L.wPos); gl.vertexAttribPointer(L.wPos, 2, gl.FLOAT, false, 0, 0);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, s.tex); gl.uniform1i(L.wScene, 0);
+    gl.uniform2f(L.wRes, w, h); gl.uniform1f(L.wProg, p);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  }
+
+  function showCanvas() {
+    if (!glState) return;
+    /* append to <html>, NOT <body> — body is transformed during the warp and
+       would otherwise distort the full-screen overlay itself. */
+    if (!glState.canvas.parentNode) document.documentElement.appendChild(glState.canvas);
+    glState.canvas.style.display = "block";
+  }
+  function hideCanvas() { if (glState && glState.canvas) glState.canvas.style.display = "none"; }
+
+  /* live page transform — sucks the view toward the vanishing centre */
+  function warpStart() {
+    document.body.classList.add("wh-warp");
+    document.body.style.transformOrigin = "50% " + (window.scrollY + window.innerHeight/2) + "px";
+    document.documentElement.style.overflow = "hidden";   // clip rotation overflow
+  }
+  function warpEnd() {
+    document.body.classList.remove("wh-warp");
+    document.body.style.transform = ""; document.body.style.opacity = "";
+    document.body.style.transformOrigin = "";
+    document.documentElement.style.overflow = "";
+  }
+  function setBody(k, isIn) {
+    var kk = isIn ? k : (1 - k);                        // 0 = settled, 1 = consumed
+    var scale = 1 - 0.16*kk, rot = 13*kk*(isIn ? 1 : -1), op = 1 - 0.6*kk;
+    document.body.style.transform = "rotate(" + rot + "deg) scale(" + scale + ")";
+    document.body.style.opacity = op;
+  }
+
+  function go(href) { try { sessionStorage.setItem(KEY, "1"); } catch (e) {} location.href = href; }
+
+  function playIn(href) {
+    if (busy) return; busy = true; readAcc();
+    if (!ensureGL()) {                                  // fallback: quick fade
+      var f = document.createElement("div"); f.className = "wh-fade"; f.style.opacity = "0";
+      document.documentElement.appendChild(f);
+      animateHalf(260, function (k) { f.style.opacity = k; }, function () { go(href); });
+      return;
+    }
+    warpStart(); showCanvas();
+    animateHalf(DUR_IN, function (k) { renderGL(0.5*k); setBody(k, true); },
+      function () { go(href); });
+  }
+
+  function playOut() {
+    try { sessionStorage.removeItem(KEY); } catch (e) {}
+    var de = document.documentElement;
+    if (reduce) { de.classList.remove("wh-emerging"); return; }
+    readAcc();
+    if (!ensureGL()) {                                  // fallback: fade the cover out
+      animateHalf(300, function (k) { de.style.setProperty("--wh-cover-op", 1 - k); },
+        function () { de.classList.remove("wh-emerging"); de.style.removeProperty("--wh-cover-op"); });
+      return;
+    }
+    busy = true; warpStart(); showCanvas();
+    renderGL(0.5);                                      // paint an opaque frame first,
+    de.classList.remove("wh-emerging");                // then drop the instant cover
+    animateHalf(DUR_OUT, function (k) { renderGL(0.5 + 0.5*k); setBody(k, false); },
+      function () { hideCanvas(); warpEnd(); busy = false; });
+  }
+
+  function navable(a) {
+    if (!a) return null;
+    if (a.target && a.target !== "_self") return null;
+    if (a.hasAttribute("download")) return null;
+    var raw = a.getAttribute("href"); if (!raw) return null;
+    var url;
+    try { url = new URL(a.href, location.href); } catch (e) { return null; }
+    if (url.origin !== location.origin) return null;
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    if (url.href === location.href) return null;
+    if (url.pathname === location.pathname && url.hash) return null;  // in-page anchor
+    return url.href;
+  }
+
+  document.addEventListener("click", function (e) {
+    if (reduce) return;
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest("a[href]");
+    var href = navable(a);
+    if (!href) return;
+    e.preventDefault();
+    if (busy) return;
+    playIn(href);
+  });
+
+  window.addEventListener("resize", function () { if (glState) resizeGL(); }, { passive: true });
+
+  /* incoming page: if we arrived through the portal, play the emerge half */
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted) {                                  // restored from bfcache — reset
+      busy = false; warpEnd(); hideCanvas();
+      document.documentElement.classList.remove("wh-emerging");
+      try { sessionStorage.removeItem(KEY); } catch (_) {}
+      return;
+    }
+  });
+
+  try { if (sessionStorage.getItem(KEY)) playOut(); } catch (e) {}
+})();
