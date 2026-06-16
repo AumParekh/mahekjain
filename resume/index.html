@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résumé — Mahek Jain</title>
+  <meta name="description" content="Résumé — Mahek Jain." />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Mahek <span>Jain</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/work">Work</a></li>
+    <li><a href="/projects">Projects</a></li>
+    <li><a href="/blog">Blog</a></li>
+    <li><a href="/contact">Contact</a></li>
+    <li><a href="/resume" class="active">Résumé</a></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/">Home</a>
+  <a href="/about">About</a>
+  <a href="/work">Work</a>
+  <a href="/projects">Projects</a>
+  <a href="/blog">Blog</a>
+  <a href="/contact">Contact</a>
+  <a href="/resume">Résumé</a>
+</div>
+
+<main class="page">
+  <div class="content-block">
+    <p class="section-label">Résumé</p>
+    <h1>On<br><em>Request</em></h1>
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      PDF coming soon
+    </div>
+    <p>A downloadable résumé is being prepared and will be available here shortly.</p>
+    <p>In the meantime, reach out directly and I'll send it over right away.</p>
+    <a href="/contact" class="btn btn-primary">Request résumé</a>
+    <a href="/" class="btn">← Back home</a>
+  </div>
+</main>
+
+<footer>
+  <span>© 2026 Mahek Jain</span>
+  <span>mahekjain.com</span>
+</footer>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+</script>
+</body>
+</html>
