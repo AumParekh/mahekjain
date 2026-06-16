@@ -1,64 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Résumé — Mahek Jain</title>
-  <meta name="description" content="Résumé — Mahek Jain." />
-  <link rel="stylesheet" href="/style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Résumé — Mahek Jain</title>
+<meta name="description" content="Résumé of Mahek Jain — creative designer: branding, UX and web, built on experience design." />
+<meta name="theme-color" content="#E9E9E6" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+<script>(function(){try{var t=localStorage.getItem('mj-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
 
-<nav>
-  <a href="/" class="nav-logo">Mahek <span>Jain</span></a>
-  <ul class="nav-links">
-    <li><a href="/">Home</a></li>
-    <li><a href="/about">About</a></li>
-    <li><a href="/work">Work</a></li>
-    <li><a href="/projects">Projects</a></li>
-    <li><a href="/blog">Blog</a></li>
-    <li><a href="/contact">Contact</a></li>
-    <li><a href="/resume" class="active">Résumé</a></li>
-  </ul>
-  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
+<a class="skip" href="#main">Skip to content</a>
+<span class="sheet-rule left"></span>
+<span class="sheet-rule right"></span>
+
+<nav class="nav">
+  <span class="nav__progress"></span>
+  <a href="/" class="nav__mark">Mahek<b>.</b>Jain</a>
+  <div class="nav__right">
+    <div class="nav__links">
+      <a href="/about"><span class="nav__num">01</span>About</a>
+      <a href="/work"><span class="nav__num">02</span>Work</a>
+      <a href="/projects"><span class="nav__num">03</span>Projects</a>
+      <a href="/blog"><span class="nav__num">04</span>Blog</a>
+      <a href="/contact"><span class="nav__num">05</span>Contact</a>
+      <a href="/resume" class="active"><span class="nav__num">06</span>Résumé</a>
+    </div>
+    <button class="theme-toggle" data-theme-toggle aria-label="Switch theme" title="Switch theme">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+    <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">Menu</button>
+  </div>
 </nav>
 
-<div class="mobile-menu" id="mobileMenu">
-  <a href="/">Home</a>
-  <a href="/about">About</a>
-  <a href="/work">Work</a>
-  <a href="/projects">Projects</a>
-  <a href="/blog">Blog</a>
-  <a href="/contact">Contact</a>
-  <a href="/resume">Résumé</a>
-</div>
+<main id="main">
 
-<main class="page">
-  <div class="content-block">
-    <p class="section-label">Résumé</p>
-    <h1>On<br><em>Request</em></h1>
-    <div class="status-pill">
-      <span class="status-dot"></span>
-      PDF coming soon
+  <header class="page-hero wrap">
+    <span class="eyebrow reveal">Résumé <span class="coord">/ specification</span></span>
+    <h1 class="page-hero__title display reveal" data-delay="1">Mahek Jain</h1>
+    <p class="page-hero__line reveal" data-delay="2">Creative designer — branding, UX &amp; web, built on three years of experience design.</p>
+    <p class="reveal" data-delay="3" style="margin-top:1.5rem"><a class="btn btn--crimson" href="/contact" data-magnet>Request PDF <span class="arr">→</span></a></p>
+  </header>
+
+  <section class="section--tight">
+    <div class="wrap cv">
+      <aside class="cv__aside reveal">
+        <div class="cv__group">
+          <span class="cv__k">Contact</span>
+          <a class="ulink" href="mailto:hello@mahekjain.com">hello@mahekjain.com</a>
+          <a class="ulink" href="tel:+917801956285">+91 78019 56285</a>
+        </div>
+        <div class="cv__group">
+          <span class="cv__k">Disciplines</span>
+          <div class="cv__chips"><span class="tag">Branding</span><span class="tag">UX</span><span class="tag">Web</span><span class="tag">Spatial</span></div>
+        </div>
+        <div class="cv__group">
+          <span class="cv__k">Tools</span>
+          <div class="cv__chips"><span class="tag">Illustrator</span><span class="tag">Photoshop</span><span class="tag">Adobe XD</span><span class="tag">Figma</span><span class="tag">Canva</span></div>
+        </div>
+        <div class="cv__group">
+          <span class="cv__k">Status</span>
+          <span class="muted">Open to opportunities</span>
+        </div>
+      </aside>
+
+      <div class="cv__main reveal" data-delay="1">
+        <div class="cv__section">
+          <h3>Profile</h3>
+          <p class="measure">Creative designer moving from event &amp; experience design into branding, UX and web. I design systems that hold together and guide people through them with intention — whether the medium is a room or a screen.</p>
+        </div>
+
+        <div class="cv__section">
+          <h3>Experience</h3>
+          <div class="exp">
+            <div class="exp__row">
+              <div class="exp__when">2023 — 2026</div>
+              <div>
+                <div class="exp__role">Design Associate</div>
+                <div class="exp__org">Astraea Events</div>
+                <p class="exp__desc">Led creative direction and execution for luxury weddings and social events, owning the work from first concept through final build.</p>
+              </div>
+            </div>
+            <div class="exp__row">
+              <div class="exp__when">2022 — 2023</div>
+              <div>
+                <div class="exp__role">Event Designer</div>
+                <div class="exp__org">Golden Chariot</div>
+                <p class="exp__desc">Developed event themes, moodboards and décor concepts across architectural planning, space visualization and layout development.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cv__section">
+          <h3>Education</h3>
+          <div class="exp">
+            <div class="exp__row">
+              <div class="exp__when">2022 — 2025</div>
+              <div>
+                <div class="exp__role">Bachelor of Management Studies</div>
+                <div class="exp__org">NAEMD — Nat. Academy of Event Management &amp; Development</div>
+                <p class="exp__desc">Formal grounding in managing creative projects end to end — concept, stakeholders, logistics and delivery.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cv__section">
+          <h3>Capabilities</h3>
+          <p class="measure muted">Typography &amp; layout · Branding &amp; identity · Composition &amp; visual hierarchy · Design systems &amp; component libraries · Design ops · Consistency at scale · UI/UX &amp; web design · AI-assisted design · Responsive thinking.</p>
+        </div>
+      </div>
     </div>
-    <p>A downloadable résumé is being prepared and will be available here shortly.</p>
-    <p>In the meantime, reach out directly and I'll send it over right away.</p>
-    <a href="/contact" class="btn btn-primary">Request résumé</a>
-    <a href="/" class="btn">← Back home</a>
-  </div>
+  </section>
+
 </main>
 
-<footer>
-  <span>© 2026 Mahek Jain</span>
-  <span>mahekjain.com</span>
+<footer class="wrap">
+  <div class="foot">
+    <span>Mahek Jain — Creative Designer</span>
+    <span><a class="ulink" href="/">Back to home</a></span>
+  </div>
 </footer>
 
-<script>
-  function toggleMenu() {
-    document.getElementById('mobileMenu').classList.toggle('open');
-  }
-</script>
+<script src="/main.js"></script>
 </body>
 </html>
