@@ -44,6 +44,39 @@
     });
   }
 
+  /* --- legend "drafting light": cursor-trailed spotlight that reveals a
+         blueprint grid beneath the design-system section. Desktop + motion
+         only; the layer is created here so no-JS users never get it. --- */
+  if (fine && !reduce) {
+    var legend = document.querySelector(".legend");
+    if (legend) {
+      var light = document.createElement("div");
+      light.className = "legend__light";
+      light.setAttribute("aria-hidden", "true");
+      legend.appendChild(light);
+      var lx = 0, ly = 0, ltx = 0, lty = 0, lit = false, raf = null;
+      function lstep() {
+        lx += (ltx - lx) * 0.18; ly += (lty - ly) * 0.18;
+        light.style.setProperty("--lx", lx + "px");
+        light.style.setProperty("--ly", ly + "px");
+        if (Math.abs(ltx - lx) > 0.5 || Math.abs(lty - ly) > 0.5) {
+          raf = requestAnimationFrame(lstep);
+        } else { raf = null; }
+      }
+      legend.addEventListener("mousemove", function (e) {
+        var r = legend.getBoundingClientRect();
+        ltx = e.clientX - r.left; lty = e.clientY - r.top;
+        if (!raf) raf = requestAnimationFrame(lstep);
+      });
+      legend.addEventListener("mouseenter", function () {
+        lit = true; legend.classList.add("is-lit");
+      });
+      legend.addEventListener("mouseleave", function () {
+        lit = false; legend.classList.remove("is-lit");
+      });
+    }
+  }
+
   /* --- nav: stuck state, scroll progress, mobile toggle --- */
   var nav = document.querySelector(".nav");
   var progress = document.querySelector(".nav__progress");
