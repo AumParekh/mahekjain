@@ -323,9 +323,10 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
 .hero { min-height: 100svh; display: flex; flex-direction: column;
   justify-content: center; padding-top: var(--s8); padding-bottom: var(--s6);
   position: relative; }
-/* 3D accent: a rotating wireframe globe — a spatial form drawn as a flat
-   plan ("spaces → screens"). Injected by JS, sits behind the hero copy
-   (negative z within the .wrap stacking context). Home page only. */
+/* 3D accent: a rotating WebGL wireframe globe — a spatial form drawn as a
+   flat plan ("spaces → screens"). Injected by JS into each page's hero
+   (.hero / .page-hero / .cs-hero), sitting behind the copy via negative z
+   within the .wrap stacking context. Hidden on small screens. */
 .hero__globe { position: absolute; inset: 0; z-index: -1; pointer-events: none;
   width: 100%; height: 100%; }
 @media (max-width: 760px) { .hero__globe { display: none; } }
