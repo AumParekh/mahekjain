@@ -682,10 +682,10 @@ a:focus-visible, button:focus-visible, .btn:focus-visible {
    shader. All motion is JS/GLSL-driven, not CSS transitions. */
 .wh-canvas { position: fixed; inset: 0; width: 100%; height: 100%;
   z-index: 2147483647; pointer-events: none; display: block; }
-.wh-fade { position: fixed; inset: 0; background: #0a0a0c;
+.wh-fade { position: fixed; inset: 0; background: #050d0e;
   z-index: 2147483646; pointer-events: none; }
 html.wh-emerging::before { content: ""; position: fixed; inset: 0;
-  background: #0a0a0c; z-index: 2147483646; pointer-events: none;
+  background: #050d0e; z-index: 2147483646; pointer-events: none;
   opacity: var(--wh-cover-op, 1); }
 /* page content gets pulled toward / pushed from the vanishing centre */
 .wh-warp { transform-origin: 50% 50%; will-change: transform, opacity; }

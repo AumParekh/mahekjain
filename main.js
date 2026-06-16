@@ -414,40 +414,42 @@
   "use strict";
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var KEY = "wh-nav";
-  var DUR_IN = 380, DUR_OUT = 460;
-  var busy = false, glState, ACC = [0.69, 0.12, 0.18];
+  var DUR_IN = 420, DUR_OUT = 520;
+  var busy = false, glState, ACC = [0.69, 0.12, 0.18], PET = [0.075, 0.306, 0.282];
 
   var VSRC = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos,0.0,1.0);}";
   var SCENE_FS =
     "precision mediump float;uniform vec2 uRes;uniform float uTime;" +
-    "uniform vec3 uAccent;uniform vec3 uVoid;" +
+    "uniform vec3 uAccent;uniform vec3 uAccent2;uniform vec3 uVoid;" +
     "float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}" +
     "float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);" +
     "float a=hash(i),b=hash(i+vec2(1.0,0.0)),c=hash(i+vec2(0.0,1.0)),d=hash(i+vec2(1.0,1.0));" +
     "return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}" +
     "void main(){vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;" +
     "float r=length(uv)+1e-4;float a=atan(uv.y,uv.x);" +
-    "float depth=0.35/r+uTime*0.6;vec2 tc=vec2(a*1.2732,depth);" +
-    "float n=noise(tc*3.0)*0.6+noise(tc*7.0)*0.3;" +
-    "float cell=hash(floor(vec2(a*3.5,depth*1.5)));" +
-    "float star=smoothstep(0.93,1.0,cell)*smoothstep(0.0,0.6,fract(depth*0.7+cell));" +
-    "float glow=smoothstep(0.55,0.0,r);" +
-    "vec3 col=mix(uVoid,uAccent,clamp(n*0.6+glow*0.7,0.0,1.0));" +
-    "col+=vec3(1.0,0.95,0.9)*star*1.3;gl_FragColor=vec4(col,1.0);}";
+    "float depth=0.35/r+uTime*0.5;vec2 tc=vec2(a*1.2732,depth);" +
+    "float n=noise(tc*2.5)*0.6+noise(tc*5.5)*0.3;" +            // softer nebula
+    "float core=smoothstep(0.62,0.0,r);" +                      // 1 at the centre
+    "vec3 neb=mix(uAccent2,uAccent,core);" +                    // petrol -> crimson inward
+    "vec3 col=mix(uVoid,neb,clamp(n*0.55+core*0.65,0.0,1.0));" +
+    "float cell=hash(floor(vec2(a*3.0,depth*1.2)));" +          // gentler star streaks
+    "float star=smoothstep(0.96,1.0,cell)*smoothstep(0.0,0.5,fract(depth*0.6+cell));" +
+    "col+=mix(uAccent2,vec3(1.0),0.5)*star*0.8;" +
+    "gl_FragColor=vec4(col,1.0);}";
   var WARP_FS =
     "precision mediump float;uniform sampler2D uScene;uniform vec2 uRes;uniform float uProgress;" +
     "void main(){vec2 c=(gl_FragCoord.xy-0.5*uRes)/uRes.y;" +
     "float r=length(c)+1e-4;float ang=atan(c.y,c.x);" +
     "float inten=1.0-abs(uProgress*2.0-1.0);float dir=uProgress<0.5?1.0:-1.0;" +
-    "ang+=(0.55/(r+0.12))*inten*dir;" +
+    "ang+=(0.5/(r+0.14))*inten*dir;" +                          // gentler twist
     "float rr=r*(1.0-0.55*inten*clamp(1.0-r,0.0,1.0));" +
     "vec2 wc=vec2(cos(ang),sin(ang))*rr;" +
     "vec2 uv=vec2(wc.x*uRes.y/uRes.x,wc.y)+0.5;" +
-    "vec2 dv=c/r;float ca=0.018*inten;" +
+    "vec2 dv=c/r;float ca=0.016*inten;" +
     "float R=texture2D(uScene,uv+dv*ca).r;" +
     "float G=texture2D(uScene,uv).g;" +
     "float B=texture2D(uScene,uv-dv*ca).b;" +
-    "float alpha=smoothstep(0.0,0.32,inten);" +
+    "float alpha=smoothstep(0.0,0.42,inten);" +                 // smoother reveal
     "gl_FragColor=vec4(vec3(R,G,B)*alpha,alpha);}";
 
   function hexRGB(h) {
@@ -458,8 +460,11 @@
     return [((n>>16)&255)/255, ((n>>8)&255)/255, (n&255)/255];
   }
   function readAcc() {
-    try { ACC = hexRGB(getComputedStyle(document.documentElement).getPropertyValue("--crimson")); }
-    catch (e) {}
+    try {
+      var cs = getComputedStyle(document.documentElement);
+      ACC = hexRGB(cs.getPropertyValue("--crimson"));
+      PET = hexRGB(cs.getPropertyValue("--petrol"));
+    } catch (e) {}
   }
   function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
   function animateHalf(dur, onFrame, done) {
@@ -502,7 +507,7 @@
       loc: {
         sPos: gl.getAttribLocation(sceneP, "aPos"), sRes: gl.getUniformLocation(sceneP, "uRes"),
         sTime: gl.getUniformLocation(sceneP, "uTime"), sAcc: gl.getUniformLocation(sceneP, "uAccent"),
-        sVoid: gl.getUniformLocation(sceneP, "uVoid"),
+        sAcc2: gl.getUniformLocation(sceneP, "uAccent2"), sVoid: gl.getUniformLocation(sceneP, "uVoid"),
         wPos: gl.getAttribLocation(warpP, "aPos"), wRes: gl.getUniformLocation(warpP, "uRes"),
         wScene: gl.getUniformLocation(warpP, "uScene"), wProg: gl.getUniformLocation(warpP, "uProgress")
       }
@@ -535,7 +540,8 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, s.quad);
     gl.enableVertexAttribArray(L.sPos); gl.vertexAttribPointer(L.sPos, 2, gl.FLOAT, false, 0, 0);
     gl.uniform2f(L.sRes, w, h); gl.uniform1f(L.sTime, t);
-    gl.uniform3f(L.sAcc, ACC[0], ACC[1], ACC[2]); gl.uniform3f(L.sVoid, 0.039, 0.043, 0.051);
+    gl.uniform3f(L.sAcc, ACC[0], ACC[1], ACC[2]); gl.uniform3f(L.sAcc2, PET[0], PET[1], PET[2]);
+    gl.uniform3f(L.sVoid, 0.02, 0.05, 0.055);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);           // pass 2: warp -> screen
     gl.viewport(0, 0, w, h);
