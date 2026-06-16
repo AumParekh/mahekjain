@@ -44,6 +44,39 @@
     });
   }
 
+  /* --- legend "drafting light": cursor-trailed spotlight that reveals a
+         blueprint grid beneath the design-system section. Desktop + motion
+         only; the layer is created here so no-JS users never get it. --- */
+  if (fine && !reduce) {
+    var legend = document.querySelector(".legend");
+    if (legend) {
+      var light = document.createElement("div");
+      light.className = "legend__light";
+      light.setAttribute("aria-hidden", "true");
+      legend.appendChild(light);
+      var lx = 0, ly = 0, ltx = 0, lty = 0, lit = false, raf = null;
+      function lstep() {
+        lx += (ltx - lx) * 0.18; ly += (lty - ly) * 0.18;
+        light.style.setProperty("--lx", lx + "px");
+        light.style.setProperty("--ly", ly + "px");
+        if (Math.abs(ltx - lx) > 0.5 || Math.abs(lty - ly) > 0.5) {
+          raf = requestAnimationFrame(lstep);
+        } else { raf = null; }
+      }
+      legend.addEventListener("mousemove", function (e) {
+        var r = legend.getBoundingClientRect();
+        ltx = e.clientX - r.left; lty = e.clientY - r.top;
+        if (!raf) raf = requestAnimationFrame(lstep);
+      });
+      legend.addEventListener("mouseenter", function () {
+        lit = true; legend.classList.add("is-lit");
+      });
+      legend.addEventListener("mouseleave", function () {
+        lit = false; legend.classList.remove("is-lit");
+      });
+    }
+  }
+
   /* --- nav: stuck state, scroll progress, mobile toggle --- */
   var nav = document.querySelector(".nav");
   var progress = document.querySelector(".nav__progress");
@@ -158,5 +191,136 @@
       });
     }, { rootMargin: "-45% 0px -50% 0px" });
     Object.keys(map).forEach(function (id) { sio.observe(document.getElementById(id)); });
+  }
+
+  /* --- 3D wireframe globe (home hero accent) -----------------------------
+     Dependency-free: a real perspective projection of a lat/long sphere,
+     drawn as hairlines on a 2D canvas — no WebGL engine, no library, ~few KB.
+     A spatial form rendered as a flat plan, the site's thesis made literal.
+     Progressive enhancement: created only if a .hero exists and the canvas
+     2D context is available. Reduced motion → one static frame, no loop. --- */
+  var hero = document.querySelector(".hero");
+  if (hero) {
+    var cv = document.createElement("canvas");
+    var ctx = cv.getContext && cv.getContext("2d");
+    if (ctx) {
+      cv.className = "hero__globe";
+      cv.setAttribute("aria-hidden", "true");
+      hero.appendChild(cv);
+
+      var dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+      var W = 0, H = 0;
+      function resize() {
+        var r = hero.getBoundingClientRect();
+        W = r.width; H = r.height;
+        cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      resize();
+      if (typeof ResizeObserver !== "undefined") {
+        new ResizeObserver(resize).observe(hero);
+      } else { window.addEventListener("resize", resize); }
+
+      /* theme-aware colours, refreshed when the theme token block swaps */
+      var col = { line: "#17181A", accent: "#B11E2F" };
+      function readColors() {
+        var cs = getComputedStyle(document.documentElement);
+        var ln = (cs.getPropertyValue("--ink") || "").trim();
+        var ac = (cs.getPropertyValue("--accent") || "").trim();
+        // some engines leave var() chains unresolved — fall back to base hex
+        if (ln && ln.indexOf("var") < 0) col.line = ln;
+        if (ac && ac.indexOf("var") < 0) col.accent = ac;
+        else col.accent = (cs.getPropertyValue("--crimson") || col.accent).trim();
+      }
+      readColors();
+      new MutationObserver(readColors).observe(root, {
+        attributes: true, attributeFilter: ["data-theme"]
+      });
+
+      /* sphere geometry: latitude rings + longitude meridians */
+      var NLAT = 9, NLON = 14, SEG = 48;
+      function ringLat(phi) {
+        var pts = [], i, t;
+        for (i = 0; i <= SEG; i++) {
+          t = (i / SEG) * Math.PI * 2;
+          pts.push([Math.cos(phi) * Math.cos(t), Math.sin(phi), Math.cos(phi) * Math.sin(t)]);
+        }
+        return pts;
+      }
+      function ringLon(theta) {
+        var pts = [], i, p;
+        for (i = 0; i <= SEG; i++) {
+          p = -Math.PI / 2 + (i / SEG) * Math.PI;
+          pts.push([Math.cos(p) * Math.cos(theta), Math.sin(p), Math.cos(p) * Math.sin(theta)]);
+        }
+        return pts;
+      }
+      var rings = [], k;
+      for (k = 1; k < NLAT; k++) rings.push(ringLat(-Math.PI / 2 + (k / NLAT) * Math.PI));
+      for (k = 0; k < NLON; k++) rings.push(ringLon((k / NLON) * Math.PI * 2));
+
+      var ry = 0, rx = -0.42, txr = 0, tyr = 0;   // rotation + cursor target
+      window.addEventListener("mousemove", function (e) {
+        tyr = (e.clientX / window.innerWidth - 0.5) * 0.6;
+        txr = (e.clientY / window.innerHeight - 0.5) * 0.4;
+      }, { passive: true });
+
+      function frame(t) {
+        var cx = W * 0.72, cy = H * 0.46;
+        var R = Math.min(W, H) * (W < 900 ? 0.30 : 0.36);
+        var dist = 3.0, focal = 2.4;
+        ry += reduce ? 0 : 0.0016;
+        var ay = ry + (reduce ? 0 : tyr), ax = rx + (reduce ? 0 : txr);
+        var cosY = Math.cos(ay), sinY = Math.sin(ay);
+        var cosX = Math.cos(ax), sinX = Math.sin(ax);
+        ctx.clearRect(0, 0, W, H);
+        ctx.lineWidth = 1;
+        for (var r = 0; r < rings.length; r++) {
+          var ring = rings[r];
+          ctx.beginPath();
+          var depthSum = 0;
+          for (var i = 0; i < ring.length; i++) {
+            var v = ring[i], x = v[0], y = v[1], z = v[2];
+            var x1 = x * cosY - z * sinY, z1 = x * sinY + z * cosY;       // yaw
+            var y2 = y * cosX - z1 * sinX, z2 = y * sinX + z1 * cosX;     // pitch
+            var s = focal / (dist + z2);
+            depthSum += z2;
+            var px = cx + x1 * R * s, py = cy + y2 * R * s;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          var depth = depthSum / ring.length;                  // -1 (near) .. 1 (far)
+          var alpha = 0.20 - depth * 0.13;                     // far side fades back
+          ctx.strokeStyle = col.line;
+          ctx.globalAlpha = Math.max(0.05, Math.min(0.30, alpha));
+          ctx.stroke();
+        }
+        // poles — a single touch of crimson, the markup pen
+        ctx.fillStyle = col.accent;
+        for (var pi = 0; pi < 2; pi++) {
+          var py0 = pi === 0 ? 1 : -1;
+          var z2 = py0 * sinX, y2 = py0 * cosX;
+          var s2 = focal / (dist + z2);
+          ctx.globalAlpha = z2 < 0 ? 0.85 : 0.35;
+          ctx.beginPath();
+          ctx.arc(cx, cy + y2 * R * s2, 2.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      if (reduce) {
+        frame(0);                                  // single static wireframe
+      } else {
+        var running = true;
+        if ("IntersectionObserver" in window) {     // pause when hero off-screen
+          new IntersectionObserver(function (en) { running = en[0].isIntersecting; })
+            .observe(hero);
+        }
+        (function loop(t) {
+          if (running && W > 0) frame(t);
+          requestAnimationFrame(loop);
+        })();
+      }
+    }
   }
 })();

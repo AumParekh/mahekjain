@@ -51,6 +51,10 @@
   --accent:    var(--crimson);
   --accent-2:  var(--petrol);
   --grid-dot:  rgba(23,24,26,0.045);
+  /* liquid-glass surfaces — frosted, but drafted (square, hairline rim) */
+  --glass-fill: color-mix(in srgb, var(--paper) 58%, transparent);
+  --glass-hi:   rgba(255,255,255,0.62);
+  --glass-rim:  rgba(255,255,255,0.55);
   color-scheme: light;
 }
 
@@ -66,6 +70,9 @@
   --accent:    var(--crimson-2);
   --accent-2:  var(--petrol-2);
   --grid-dot:  rgba(236,236,232,0.05);
+  --glass-fill: color-mix(in srgb, var(--paper) 52%, transparent);
+  --glass-hi:   rgba(255,255,255,0.10);
+  --glass-rim:  rgba(255,255,255,0.14);
   color-scheme: dark;
 }
 
@@ -109,7 +116,11 @@ img { max-width: 100%; display: block; }
 .sheet-rule {
   position: fixed; top: 0; bottom: 0; width: 1px;
   background: var(--line-soft); z-index: 1; pointer-events: none;
+  /* the sheet is "drawn" on first paint — the gutter guides scale in
+     from the top. One-time, reduced-motion collapses it to instant. */
+  transform-origin: top; animation: draw-rule 1.1s var(--ease) both;
 }
+@keyframes draw-rule { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 .sheet-rule.left  { left: var(--gutter); }
 .sheet-rule.right { right: var(--gutter); }
 @media (max-width: 720px) { .sheet-rule { display: none; } }
@@ -178,6 +189,22 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
 .btn--solid:hover { background: transparent; color: var(--ink); }
 .btn .arr { transition: transform .3s var(--ease); }
 .btn:hover .arr { transform: translateX(3px); }
+/* liquid glass: frosted fill + inset highlight + a refractive gradient rim.
+   Square-cornered to honour the system's "0 radius — drafted, not soft". */
+.btn { position: relative; isolation: isolate; }
+.btn > * { position: relative; z-index: 1; }
+.btn::before { content: ""; position: absolute; inset: 0; z-index: 0; padding: 1px;
+  pointer-events: none; opacity: 0; transition: opacity .35s var(--ease);
+  background: linear-gradient(135deg, var(--glass-rim), transparent 38%,
+    transparent 62%, color-mix(in srgb, var(--glass-rim) 50%, transparent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .btn { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    box-shadow: inset 0 1px 0 var(--glass-hi); }
+  .btn::before { opacity: 1; }
+}
 
 /* underline-draw link */
 .ulink { position: relative; display: inline-block; }
@@ -196,6 +223,15 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
   transition: border-color .4s var(--ease), padding .4s var(--ease),
               background .5s var(--ease); }
 .nav.is-stuck { border-color: var(--line); padding-block: var(--s2); }
+/* liquid-glass bar: frosted fill, saturated blur, inset top highlight.
+   Square + hairline so it still reads as the drafting sheet, not a pill. */
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .nav, .cs-nav {
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+            backdrop-filter: blur(18px) saturate(1.5);
+    box-shadow: inset 0 1px 0 var(--glass-hi); }
+}
 .nav__mark { font-family: var(--display); font-weight: 600; font-size: 1.3rem;
   letter-spacing: -0.01em; display: inline-flex; align-items: baseline; gap: .1rem; }
 .nav__mark b { color: var(--accent); font-weight: 600; }
@@ -215,6 +251,11 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
   display: inline-grid; place-items: center; cursor: pointer; color: var(--ink);
   transition: border-color .3s var(--ease), color .3s var(--ease), transform .3s var(--ease); }
 .theme-toggle:hover { border-color: var(--accent); color: var(--accent); transform: rotate(-15deg); }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .theme-toggle { background: var(--glass-fill);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    box-shadow: inset 0 1px 0 var(--glass-hi); }
+}
 .theme-toggle svg { width: 16px; height: 16px; }
 .theme-toggle .moon { display: none; }
 [data-theme="dark"] .theme-toggle .sun  { display: none; }
@@ -239,17 +280,34 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
     flex-direction: column; justify-content: center; align-items: center; gap: var(--s4);
     transform: translateY(-100%); transition: transform .5s var(--ease); }
   .nav__links.open { transform: translateY(0); }
-  .nav__links a { font-size: 1.5rem; font-family: var(--display); }
+  .nav__links a { font-size: 1.5rem; font-family: var(--display);
+    /* staggered entrance — links rise in sequence once the overlay opens */
+    opacity: 0; transform: translateY(16px);
+    transition: opacity .5s var(--ease), transform .5s var(--ease); }
+  .nav__links.open a { opacity: 1; transform: none; }
+  .nav__links.open a:nth-child(1) { transition-delay: .16s; }
+  .nav__links.open a:nth-child(2) { transition-delay: .22s; }
+  .nav__links.open a:nth-child(3) { transition-delay: .28s; }
+  .nav__links.open a:nth-child(4) { transition-delay: .34s; }
+  .nav__links.open a:nth-child(5) { transition-delay: .40s; }
+  .nav__links.open a:nth-child(6) { transition-delay: .46s; }
   .nav__links .nav__num { font-size: 0.95rem; }
   /* keep the bar controls above the overlay so Close stays tappable */
   .nav__mark, .theme-toggle, .nav__toggle { position: relative; z-index: 60; }
   .nav__toggle { display: block; }
+  /* the fullscreen overlay becomes frosted glass over the page — only where
+     backdrop-filter is supported; otherwise it stays solid for legibility. */
+  @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .nav__links { background: color-mix(in srgb, var(--paper) 72%, transparent);
+      -webkit-backdrop-filter: blur(22px) saturate(1.4);
+              backdrop-filter: blur(22px) saturate(1.4); }
+  }
 }
 
 /* ---- 9. REVEAL ANIMATION ------------------------------------- */
-.reveal { opacity: 0; transform: translateY(22px); }
-.reveal.in { opacity: 1; transform: none;
-  transition: opacity .8s var(--ease), transform .8s var(--ease); }
+.reveal { opacity: 0; transform: translateY(22px); filter: blur(5px); }
+.reveal.in { opacity: 1; transform: none; filter: none;
+  transition: opacity .8s var(--ease), transform .8s var(--ease), filter .8s var(--ease); }
 .reveal[data-delay="1"].in { transition-delay: .08s; }
 .reveal[data-delay="2"].in { transition-delay: .16s; }
 .reveal[data-delay="3"].in { transition-delay: .24s; }
@@ -265,6 +323,12 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
 .hero { min-height: 100svh; display: flex; flex-direction: column;
   justify-content: center; padding-top: var(--s8); padding-bottom: var(--s6);
   position: relative; }
+/* 3D accent: a rotating wireframe globe — a spatial form drawn as a flat
+   plan ("spaces → screens"). Injected by JS, sits behind the hero copy
+   (negative z within the .wrap stacking context). Home page only. */
+.hero__globe { position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  width: 100%; height: 100%; }
+@media (max-width: 760px) { .hero__globe { display: none; } }
 .hero__tag { display: flex; gap: var(--s3); flex-wrap: wrap; margin-bottom: var(--s4); }
 .hero__name { font-size: var(--t-hero); margin: 0.1em 0 0.15em; }
 .hero__name .amp { color: var(--accent); }
@@ -418,7 +482,25 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
 @keyframes marq { to { transform: translateX(calc(-50% - var(--gap)/2)); } }
 
 /* ---- 19. DESIGN SYSTEM (the legend / easter egg) ------------- */
-.legend { background: var(--ink); color: var(--paper); }
+.legend { background: var(--ink); color: var(--paper); overflow: hidden; }
+/* cursor "drafting light": a soft circular mask trailing the pointer that
+   reveals a faint petrol blueprint grid beneath the ink — the pivot, made
+   visible. Layer is injected by JS (fine pointer, motion allowed) only, so
+   no-JS / touch / reduced-motion never see it. Sits below .wrap (z-index:2). */
+.legend__light {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0; transition: opacity .45s var(--ease);
+  background-image:
+    repeating-linear-gradient(0deg,  transparent 0 29px,
+      color-mix(in srgb, var(--petrol-2) 55%, transparent) 29px 30px),
+    repeating-linear-gradient(90deg, transparent 0 29px,
+      color-mix(in srgb, var(--petrol-2) 55%, transparent) 29px 30px);
+  -webkit-mask: radial-gradient(circle 190px at var(--lx, -100px) var(--ly, -100px),
+      #000 0%, rgba(0,0,0,.35) 45%, transparent 72%);
+          mask: radial-gradient(circle 190px at var(--lx, -100px) var(--ly, -100px),
+      #000 0%, rgba(0,0,0,.35) 45%, transparent 72%);
+}
+.legend.is-lit .legend__light { opacity: .9; }
 .legend .eyebrow { color: color-mix(in srgb, var(--paper) 60%, transparent); }
 .legend .eyebrow::before { background: var(--accent); }
 .legend .eyebrow .coord { color: var(--petrol-2); }
@@ -579,10 +661,13 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .001ms !important;
     animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
-  .reveal { opacity: 1; transform: none; }
+  .reveal { opacity: 1; transform: none; filter: none; }
   .word > span { transform: none; }
   .cursor { display: none; }
   .marquee__track { animation: none; }
+  .sheet-rule { animation: none; transform: none; }
+  .nav__links a { opacity: 1; transform: none; }
+  .legend__light { display: none; }
 }
 
 /* keyboard focus — quality floor */
