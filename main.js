@@ -66,11 +66,13 @@
         var open = links.classList.toggle("open");
         toggle.textContent = open ? "Close" : "Menu";
         toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        document.body.style.overflow = open ? "hidden" : "";
       });
       links.querySelectorAll("a").forEach(function (a) {
         a.addEventListener("click", function () {
           links.classList.remove("open"); toggle.textContent = "Menu";
           toggle.setAttribute("aria-expanded", "false");
+          document.body.style.overflow = "";
         });
       });
     }

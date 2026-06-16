@@ -191,7 +191,8 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
   display: flex; align-items: center; justify-content: space-between;
   padding: var(--s3) var(--gutter);
   background: color-mix(in srgb, var(--paper) 82%, transparent);
-  backdrop-filter: blur(10px); border-bottom: 1px solid transparent;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
   transition: border-color .4s var(--ease), padding .4s var(--ease),
               background .5s var(--ease); }
 .nav.is-stuck { border-color: var(--line); padding-block: var(--s2); }
@@ -227,12 +228,22 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
   background: var(--accent); transition: width .1s linear; z-index: 51; }
 
 @media (max-width: 940px) {
-  .nav__links { position: fixed; inset: 0; background: var(--paper);
-    flex-direction: column; justify-content: center; gap: var(--s4);
+  /* A backdrop-filter on .nav makes it the containing block for any
+     position:fixed child, which would trap this overlay inside the ~70px
+     bar. Drop the blur here and give the bar a solid fill instead so the
+     fullscreen menu can size to the viewport. */
+  .nav { backdrop-filter: none; -webkit-backdrop-filter: none;
+    background: var(--paper); }
+  .nav__links { position: fixed; inset: 0; min-height: 100dvh; z-index: 55;
+    background: var(--paper);
+    flex-direction: column; justify-content: center; align-items: center; gap: var(--s4);
     transform: translateY(-100%); transition: transform .5s var(--ease); }
   .nav__links.open { transform: translateY(0); }
-  .nav__links a { font-size: 1.4rem; font-family: var(--display); }
-  .nav__toggle { display: block; position: relative; z-index: 60; }
+  .nav__links a { font-size: 1.5rem; font-family: var(--display); }
+  .nav__links .nav__num { font-size: 0.95rem; }
+  /* keep the bar controls above the overlay so Close stays tappable */
+  .nav__mark, .theme-toggle, .nav__toggle { position: relative; z-index: 60; }
+  .nav__toggle { display: block; }
 }
 
 /* ---- 9. REVEAL ANIMATION ------------------------------------- */
@@ -502,7 +513,8 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
   display: flex; align-items: center; justify-content: space-between;
   padding: var(--s3) var(--gutter);
   background: color-mix(in srgb, var(--paper) 82%, transparent);
-  backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line); }
 .cs-back { font-family: var(--mono); font-size: var(--t-small); display: inline-flex;
   gap: 0.6rem; align-items: center; }
 .cs-back .arr { transition: transform .3s var(--ease); }
