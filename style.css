@@ -51,6 +51,10 @@
   --accent:    var(--crimson);
   --accent-2:  var(--petrol);
   --grid-dot:  rgba(23,24,26,0.045);
+  /* liquid-glass surfaces — frosted, but drafted (square, hairline rim) */
+  --glass-fill: color-mix(in srgb, var(--paper) 58%, transparent);
+  --glass-hi:   rgba(255,255,255,0.62);
+  --glass-rim:  rgba(255,255,255,0.55);
   color-scheme: light;
 }
 
@@ -66,6 +70,9 @@
   --accent:    var(--crimson-2);
   --accent-2:  var(--petrol-2);
   --grid-dot:  rgba(236,236,232,0.05);
+  --glass-fill: color-mix(in srgb, var(--paper) 52%, transparent);
+  --glass-hi:   rgba(255,255,255,0.10);
+  --glass-rim:  rgba(255,255,255,0.14);
   color-scheme: dark;
 }
 
@@ -182,6 +189,22 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
 .btn--solid:hover { background: transparent; color: var(--ink); }
 .btn .arr { transition: transform .3s var(--ease); }
 .btn:hover .arr { transform: translateX(3px); }
+/* liquid glass: frosted fill + inset highlight + a refractive gradient rim.
+   Square-cornered to honour the system's "0 radius — drafted, not soft". */
+.btn { position: relative; isolation: isolate; }
+.btn > * { position: relative; z-index: 1; }
+.btn::before { content: ""; position: absolute; inset: 0; z-index: 0; padding: 1px;
+  pointer-events: none; opacity: 0; transition: opacity .35s var(--ease);
+  background: linear-gradient(135deg, var(--glass-rim), transparent 38%,
+    transparent 62%, color-mix(in srgb, var(--glass-rim) 50%, transparent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .btn { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    box-shadow: inset 0 1px 0 var(--glass-hi); }
+  .btn::before { opacity: 1; }
+}
 
 /* underline-draw link */
 .ulink { position: relative; display: inline-block; }
@@ -200,6 +223,15 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
   transition: border-color .4s var(--ease), padding .4s var(--ease),
               background .5s var(--ease); }
 .nav.is-stuck { border-color: var(--line); padding-block: var(--s2); }
+/* liquid-glass bar: frosted fill, saturated blur, inset top highlight.
+   Square + hairline so it still reads as the drafting sheet, not a pill. */
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .nav, .cs-nav {
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+            backdrop-filter: blur(18px) saturate(1.5);
+    box-shadow: inset 0 1px 0 var(--glass-hi); }
+}
 .nav__mark { font-family: var(--display); font-weight: 600; font-size: 1.3rem;
   letter-spacing: -0.01em; display: inline-flex; align-items: baseline; gap: .1rem; }
 .nav__mark b { color: var(--accent); font-weight: 600; }
@@ -219,6 +251,11 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
   display: inline-grid; place-items: center; cursor: pointer; color: var(--ink);
   transition: border-color .3s var(--ease), color .3s var(--ease), transform .3s var(--ease); }
 .theme-toggle:hover { border-color: var(--accent); color: var(--accent); transform: rotate(-15deg); }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .theme-toggle { background: var(--glass-fill);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    box-shadow: inset 0 1px 0 var(--glass-hi); }
+}
 .theme-toggle svg { width: 16px; height: 16px; }
 .theme-toggle .moon { display: none; }
 [data-theme="dark"] .theme-toggle .sun  { display: none; }
@@ -258,6 +295,13 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
   /* keep the bar controls above the overlay so Close stays tappable */
   .nav__mark, .theme-toggle, .nav__toggle { position: relative; z-index: 60; }
   .nav__toggle { display: block; }
+  /* the fullscreen overlay becomes frosted glass over the page — only where
+     backdrop-filter is supported; otherwise it stays solid for legibility. */
+  @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .nav__links { background: color-mix(in srgb, var(--paper) 72%, transparent);
+      -webkit-backdrop-filter: blur(22px) saturate(1.4);
+              backdrop-filter: blur(22px) saturate(1.4); }
+  }
 }
 
 /* ---- 9. REVEAL ANIMATION ------------------------------------- */
@@ -279,6 +323,12 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.04;
 .hero { min-height: 100svh; display: flex; flex-direction: column;
   justify-content: center; padding-top: var(--s8); padding-bottom: var(--s6);
   position: relative; }
+/* 3D accent: a rotating wireframe globe — a spatial form drawn as a flat
+   plan ("spaces → screens"). Injected by JS, sits behind the hero copy
+   (negative z within the .wrap stacking context). Home page only. */
+.hero__globe { position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  width: 100%; height: 100%; }
+@media (max-width: 760px) { .hero__globe { display: none; } }
 .hero__tag { display: flex; gap: var(--s3); flex-wrap: wrap; margin-bottom: var(--s4); }
 .hero__name { font-size: var(--t-hero); margin: 0.1em 0 0.15em; }
 .hero__name .amp { color: var(--accent); }
