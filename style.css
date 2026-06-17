@@ -9,10 +9,10 @@
 /* ---- 1. TOKENS ----------------------------------------------- */
 :root {
   /* brand constants — survive across themes */
-  --crimson:   #B11E2F;  /* primary accent — heritage / markup pen   */
-  --crimson-2: #D33044;  /* a brighter crimson for dark backgrounds  */
-  --petrol:    #134E48;  /* secondary tone — the digital counterweight */
-  --petrol-2:  #7FB8B0;  /* petrol, lifted for dark backgrounds      */
+  --crimson:   #C16A85;  /* primary accent — Pale Violet Red / markup pen */
+  --crimson-2: #D98AA2;  /* a brighter pink for dark backgrounds          */
+  --petrol:    #59382C;  /* secondary tone — Cappuccino                   */
+  --petrol-2:  #B58A6E;  /* cappuccino, lifted for dark backgrounds       */
 
   /* type families */
   --display: "Bodoni Moda", Georgia, serif;
@@ -41,16 +41,16 @@
 /* THEME: Plaster (default / light) — cool architectural off-white */
 :root,
 [data-theme="light"] {
-  --paper:     #E9E9E6;
-  --paper-2:   #E3E3DF;
-  --paper-3:   #DCDCD7;
-  --ink:       #17181A;
-  --ink-soft:  #4A4C4E;
-  --line:      rgba(23,24,26,0.16);
-  --line-soft: rgba(23,24,26,0.08);
+  --paper:     #FFECDA;
+  --paper-2:   #F7E0CC;
+  --paper-3:   #EFD6C0;
+  --ink:       #1E151C;
+  --ink-soft:  #6E5A50;
+  --line:      rgba(30,21,28,0.16);
+  --line-soft: rgba(30,21,28,0.08);
   --accent:    var(--crimson);
   --accent-2:  var(--petrol);
-  --grid-dot:  rgba(23,24,26,0.045);
+  --grid-dot:  rgba(30,21,28,0.045);
   /* liquid-glass surfaces — frosted, but drafted (square, hairline rim) */
   --glass-fill: color-mix(in srgb, var(--paper) 58%, transparent);
   --glass-hi:   rgba(255,255,255,0.62);
@@ -60,16 +60,16 @@
 
 /* THEME: Blueprint (dark) — the same sheet, drawn at night */
 [data-theme="dark"] {
-  --paper:     #131417;
-  --paper-2:   #191A1E;
-  --paper-3:   #202125;
-  --ink:       #ECECE8;
-  --ink-soft:  #9A9C9E;
-  --line:      rgba(236,236,232,0.16);
-  --line-soft: rgba(236,236,232,0.08);
+  --paper:     #1E151C;
+  --paper-2:   #281D25;
+  --paper-3:   #33252F;
+  --ink:       #FFECDA;
+  --ink-soft:  #C2AC9E;
+  --line:      rgba(255,236,218,0.16);
+  --line-soft: rgba(255,236,218,0.08);
   --accent:    var(--crimson-2);
   --accent-2:  var(--petrol-2);
-  --grid-dot:  rgba(236,236,232,0.05);
+  --grid-dot:  rgba(255,236,218,0.05);
   --glass-fill: color-mix(in srgb, var(--paper) 52%, transparent);
   --glass-hi:   rgba(255,255,255,0.10);
   --glass-rim:  rgba(255,255,255,0.14);
@@ -682,10 +682,10 @@ a:focus-visible, button:focus-visible, .btn:focus-visible {
    shader. All motion is JS/GLSL-driven, not CSS transitions. */
 .wh-canvas { position: fixed; inset: 0; width: 100%; height: 100%;
   z-index: 2147483647; pointer-events: none; display: block; }
-.wh-fade { position: fixed; inset: 0; background: #050d0e;
+.wh-fade { position: fixed; inset: 0; background: #150e13;
   z-index: 2147483646; pointer-events: none; }
 html.wh-emerging::before { content: ""; position: fixed; inset: 0;
-  background: #050d0e; z-index: 2147483646; pointer-events: none;
+  background: #150e13; z-index: 2147483646; pointer-events: none;
   opacity: var(--wh-cover-op, 1); }
 /* page content gets pulled toward / pushed from the vanishing centre */
 .wh-warp { transform-origin: 50% 50%; will-change: transform, opacity; }
