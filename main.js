@@ -541,7 +541,7 @@
     gl.enableVertexAttribArray(L.sPos); gl.vertexAttribPointer(L.sPos, 2, gl.FLOAT, false, 0, 0);
     gl.uniform2f(L.sRes, w, h); gl.uniform1f(L.sTime, t);
     gl.uniform3f(L.sAcc, ACC[0], ACC[1], ACC[2]); gl.uniform3f(L.sAcc2, PET[0], PET[1], PET[2]);
-    gl.uniform3f(L.sVoid, 0.02, 0.05, 0.055);
+    gl.uniform3f(L.sVoid, 0.082, 0.055, 0.075);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);           // pass 2: warp -> screen
     gl.viewport(0, 0, w, h);
