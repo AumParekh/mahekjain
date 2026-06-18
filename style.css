@@ -20,7 +20,7 @@
   --petrol-2:  #D8C6B8;  /* beige, for dark backgrounds    */
 
   /* type families — bold display, elegant italic serif, clean body */
-  --display: "Archivo Black", "Arial Black", system-ui, sans-serif;
+  --display: "Seasons", Georgia, serif;
   --serif:   "Playfair Display", Georgia, serif;
   --body:    "Inter", system-ui, sans-serif;
   --mono:    "Inter", system-ui, sans-serif;   /* labels — clean sans, letter-spaced */
@@ -120,8 +120,6 @@ img { max-width: 100%; display: block; }
 .sheet-rule {
   position: fixed; top: 0; bottom: 0; width: 1px;
   background: var(--line-soft); z-index: 1; pointer-events: none;
-  /* the sheet is "drawn" on first paint — the gutter guides scale in
-     from the top. One-time, reduced-motion collapses it to instant. */
   transform-origin: top; animation: draw-rule 1.1s var(--ease) both;
 }
 @keyframes draw-rule { from { transform: scaleY(0); } to { transform: scaleY(1); } }
@@ -166,11 +164,11 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
   letter-spacing: -0.01em; }
 .h1 { font-size: var(--t-h1); }
 .h2 { font-size: var(--t-h2); }
-.h3 { font-size: var(--t-h3); font-family: var(--body); font-weight: 600;
+.h3 { font-size: var(--t-h3); font-weight: 400;
   letter-spacing: -0.01em; line-height: 1.25; }
 
 .display em, h1 em, .h2 em, .page-hero__title em, .contact__big em {
-  font-family: var(--serif); font-style: italic; font-weight: 500;
+  font-family: var(--display); font-style: italic; font-weight: 400;
   text-transform: none; color: var(--accent); }
 
 .lede { font-size: clamp(1.15rem, 2.4vw, 1.5rem); line-height: 1.5;
@@ -180,7 +178,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
 .accent { color: var(--accent); }
 
 /* ---- 7. BUTTONS / LINKS -------------------------------------- */
-/* editorial pill: burgundy fill, white text, soft hover lift */
 .btn {
   font-family: var(--body); font-size: var(--t-small); font-weight: 600;
   letter-spacing: 0.04em; text-transform: uppercase;
@@ -192,7 +189,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
               box-shadow .3s var(--ease), background .3s var(--ease), color .3s var(--ease); }
 .btn:hover { transform: translateY(-2px) scale(1.02); gap: 1.05rem;
   box-shadow: var(--shadow-lg); background: var(--ink); border-color: var(--ink); }
-/* outline variant — burgundy outline on light surfaces */
 .btn--crimson { background: transparent; color: var(--accent); border-color: var(--accent); box-shadow: none; }
 .btn--crimson:hover { background: var(--accent); color: #FFFFFF; }
 .btn--solid { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -200,7 +196,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
 .btn .arr { transition: transform .3s var(--ease); }
 .btn:hover .arr { transform: translateX(3px); }
 
-/* underline-draw link */
 .ulink { position: relative; display: inline-block; }
 .ulink::after { content: ""; position: absolute; left: 0; bottom: -2px; height: 1px;
   width: 100%; background: currentColor; transform: scaleX(0); transform-origin: left;
@@ -208,7 +203,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
 .ulink:hover::after { transform: scaleX(1); }
 
 /* ---- 8. NAV -------------------------------------------------- */
-/* solid burgundy bar, cream text — premium and minimal */
 .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
   padding: var(--s3) var(--gutter);
@@ -230,7 +224,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
 .nav__links a:hover::after, .nav__links a.active::after { transform: scaleX(1); }
 .nav__num { color: var(--blush); margin-right: 0.35rem; }
 
-/* theme toggle */
 .theme-toggle { background: rgba(245,237,229,0.08); border: 1px solid rgba(245,237,229,0.3);
   width: 38px; height: 38px; border-radius: var(--radius-pill);
   display: inline-grid; place-items: center; cursor: pointer; color: var(--cream);
@@ -244,15 +237,10 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
 .nav__toggle { display: none; background: none; border: 0; font-family: var(--body);
   font-weight: 600; font-size: var(--t-small); cursor: pointer; color: var(--cream); }
 
-/* scroll-progress line under the nav */
 .nav__progress { position: absolute; left: 0; bottom: -1px; height: 2px; width: 0%;
   background: var(--blush); transition: width .1s linear; z-index: 51; }
 
 @media (max-width: 940px) {
-  /* A backdrop-filter on .nav makes it the containing block for any
-     position:fixed child, which would trap this overlay inside the ~70px
-     bar. Drop the blur here and give the bar a solid fill instead so the
-     fullscreen menu can size to the viewport. */
   .nav { background: var(--burgundy); }
   .nav__links { position: fixed; inset: 0; min-height: 100dvh; z-index: 55;
     background: var(--burgundy);
@@ -261,7 +249,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
   .nav__links.open { transform: translateY(0); }
   .nav__links a { font-size: 1.8rem; font-family: var(--display); color: var(--cream);
     text-transform: uppercase;
-    /* staggered entrance — links rise in sequence once the overlay opens */
     opacity: 0; transform: translateY(16px);
     transition: opacity .5s var(--ease), transform .5s var(--ease); }
   .nav__links.open a { opacity: 1; transform: none; }
@@ -272,7 +259,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
   .nav__links.open a:nth-child(5) { transition-delay: .40s; }
   .nav__links.open a:nth-child(6) { transition-delay: .46s; }
   .nav__links .nav__num { font-size: 0.95rem; color: var(--blush); }
-  /* keep the bar controls above the overlay so Close stays tappable */
   .nav__mark, .theme-toggle, .nav__toggle { position: relative; z-index: 60; }
   .nav__toggle { display: block; }
 }
@@ -286,7 +272,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
 .reveal[data-delay="3"].in { transition-delay: .24s; }
 .reveal[data-delay="4"].in { transition-delay: .32s; }
 
-/* word-by-word hero reveal */
 .word { display: inline-block; overflow: hidden; vertical-align: top; }
 .word > span { display: inline-block; transform: translateY(105%);
   transition: transform .9s var(--ease); }
@@ -296,10 +281,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
 .hero { min-height: 100svh; display: flex; flex-direction: column;
   justify-content: center; padding-top: var(--s8); padding-bottom: var(--s6);
   position: relative; }
-/* 3D accent: a rotating WebGL wireframe globe — a spatial form drawn as a
-   flat plan ("spaces → screens"). Injected by JS into each page's hero
-   (.hero / .page-hero / .cs-hero), sitting behind the copy via negative z
-   within the .wrap stacking context. Hidden on small screens. */
 .hero__globe { position: absolute; inset: 0; z-index: -1; pointer-events: none;
   width: 100%; height: 100%; }
 @media (max-width: 760px) { .hero__globe { display: none; } }
@@ -328,7 +309,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
 .head { display: grid; grid-template-columns: 1fr; gap: var(--s2); margin-bottom: var(--s5); }
 .head .h2 { max-width: 18ch; }
 
-/* page hero (inner routes) */
 .page-hero { padding-top: calc(var(--nav-h) + var(--s7)); padding-bottom: var(--s5); }
 .page-hero__title { font-size: var(--t-h1); margin: var(--s2) 0 var(--s3); max-width: 16ch; }
 .page-hero__line { font-size: clamp(1.1rem,2.2vw,1.45rem); color: var(--ink-soft); max-width: 56ch; }
@@ -457,10 +437,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
 
 /* ---- 19. DESIGN SYSTEM (the legend / easter egg) ------------- */
 .legend { background: var(--ink); color: var(--paper); overflow: hidden; }
-/* cursor "drafting light": a soft circular mask trailing the pointer that
-   reveals a faint petrol blueprint grid beneath the ink — the pivot, made
-   visible. Layer is injected by JS (fine pointer, motion allowed) only, so
-   no-JS / touch / reduced-motion never see it. Sits below .wrap (z-index:2). */
 .legend__light {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
   opacity: 0; transition: opacity .45s var(--ease);
@@ -524,7 +500,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
   text-transform: uppercase; color: var(--ink-soft); }
 .foot a:hover { color: var(--accent); }
 
-/* contact method cards */
 .cmethods { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px;
   background: var(--line); border: 1px solid var(--line); margin-top: var(--s5); }
 .cmethod { background: var(--paper); padding: var(--s4); text-align: left;
@@ -644,21 +619,17 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.02;
   .legend__light { display: none; }
 }
 
-/* keyboard focus — quality floor */
 a:focus-visible, button:focus-visible, .btn:focus-visible {
   outline: 2px solid var(--accent-2); outline-offset: 3px; }
 
 /* ---- 25. EDITORIAL SURFACES (rounded, soft, floating) -------- */
-/* Retire the drafting-sheet motifs that fight the soft editorial look */
 .sheet-rule { display: none; }
 .cursor { display: none; }
 .legend__light { display: none; }
 
-/* elegant serif italic for flowing accent lines */
-.hero__pivot { font-family: var(--serif); font-weight: 500; }
-.marquee span { font-family: var(--serif); }
+.hero__pivot { font-family: var(--display); font-style: italic; font-weight: 400; }
+.marquee span { font-family: var(--display); }
 
-/* capability cards float as individual rounded cards, alternating tones */
 .caps { border-top: 0; gap: var(--s3); }
 .cap { border: 1px solid var(--line); border-radius: var(--radius);
   background: var(--paper); box-shadow: var(--shadow); padding: var(--s4) var(--s4) var(--s5); }
@@ -666,35 +637,28 @@ a:focus-visible, button:focus-visible, .btn:focus-visible {
 .caps .cap:nth-child(even) { background: var(--paper-2); }
 .cap:hover { background: var(--paper-2); transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 
-/* toolkit tiles → rounded floating tiles */
 .tools { gap: var(--s2); background: transparent; border: 0; }
 .tool { border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
 .tool:nth-child(even) { background: var(--paper-2); }
 
-/* stat strip → rounded floating panel */
 .stats { border: 0; gap: var(--s2); }
 .stat { border: 1px solid var(--line); border-radius: var(--radius);
   background: var(--paper); box-shadow: var(--shadow); }
 
-/* project cards → large rounded cards, alternating tones */
 .pcard { border-radius: var(--radius-lg); box-shadow: var(--shadow); }
 .pcard:hover { box-shadow: var(--shadow-lg); }
 .work__grid .pcard:nth-child(even) { background: var(--paper-2); }
 
-/* contact method cards */
 .cmethods { gap: var(--s3); background: transparent; border: 0; }
 .cmethod { border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
 .cmethod:nth-child(even) { background: var(--paper-2); }
 
-/* misc rounded surfaces */
 .spec { border-radius: var(--radius); }
 .sw { border-radius: 12px; overflow: hidden; }
 .cs-cover, .cs-img, .cs-cover__label { border-radius: var(--radius-lg); }
 .tag { border-radius: var(--radius-pill); }
 input, textarea, select { border-radius: var(--radius); }
 
-/* legend swatches become little cream cards so every chip (incl. burgundy)
-   reads against the dark feature panel */
 .legend .sw { background: var(--cream); border-color: rgba(74,22,35,0.14); }
 .legend .sw__meta { color: var(--ink); }
 .legend .sw__meta b { color: var(--burgundy); }
