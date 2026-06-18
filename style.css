@@ -24,6 +24,7 @@
   --serif:   "Playfair Display", Georgia, serif;
   --body:    "Inter", system-ui, sans-serif;
   --mono:    "Inter", system-ui, sans-serif;   /* labels — clean sans, letter-spaced */
+  --footer:  "Crimson Pro", Georgia, serif;
 
   /* type scale */
   --t-hero:  clamp(3rem, 11vw, 8.5rem);
@@ -487,8 +488,8 @@ h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.02;
   font-family: var(--mono); font-size: var(--t-small); letter-spacing: 0.04em; }
 .foot { border-top: 1px solid var(--line); padding-block: var(--s4);
   display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--s2);
-  font-family: var(--mono); font-size: var(--t-mono); letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--ink-soft); }
+  font-family: var(--footer); font-size: var(--t-small); letter-spacing: 0.03em;
+  color: var(--ink-soft); }
 .foot a:hover { color: var(--accent); }
 
 .cmethods { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px;
