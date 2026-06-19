@@ -4,23 +4,34 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Mahek Jain — Creative Designer</title>
-<meta name="description" content="Mahek Jain — creative designer moving from event &amp; experience design into branding, UX and web. This site is the case study." />
+<meta name="description" content="Mahek Jain — creative designer moving from event &amp; experience design into branding, UX and web." />
 <meta name="theme-color" content="#5A1625" />
-<meta property="og:title" content="Mahek Jain — Creative Designer" />
-<meta property="og:description" content="From spaces people step into — to screens they move through. Branding · UX · Web." />
-<meta property="og:type" content="website" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/style.css?v=13" />
 <script>(function(){try{var t=localStorage.getItem('mj-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<style>
+.hero__bg{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100vw;z-index:-2;pointer-events:none;overflow:hidden;}
+.hero__orb{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform;}
+.ho1{width:80vw;height:80vw;top:-22%;right:-12%;background:radial-gradient(circle at 40% 40%,rgba(234,199,211,.80) 0%,transparent 62%);animation:hbd1 30s ease-in-out infinite;}
+.ho2{width:72vw;height:72vw;bottom:-22%;left:-16%;background:radial-gradient(circle at 58% 52%,rgba(90,22,37,.13) 0%,transparent 62%);animation:hbd2 38s ease-in-out infinite;}
+.ho3{width:62vw;height:62vw;top:18%;left:18%;background:radial-gradient(circle at 50% 50%,rgba(216,198,184,.65) 0%,transparent 62%);animation:hbd3 25s ease-in-out infinite;animation-delay:-10s;}
+.ho4{width:54vw;height:54vw;top:-12%;left:4%;background:radial-gradient(circle at 50% 50%,rgba(140,58,77,.14) 0%,transparent 62%);animation:hbd4 33s ease-in-out infinite;animation-delay:-17s;}
+[data-theme="dark"] .ho1{background:radial-gradient(circle at 40% 40%,rgba(140,58,77,.68) 0%,transparent 62%);}
+[data-theme="dark"] .ho2{background:radial-gradient(circle at 58% 52%,rgba(110,36,56,.82) 0%,transparent 62%);}
+[data-theme="dark"] .ho3{background:radial-gradient(circle at 50% 50%,rgba(245,237,229,.045) 0%,transparent 62%);}
+[data-theme="dark"] .ho4{background:radial-gradient(circle at 50% 50%,rgba(200,115,135,.32) 0%,transparent 62%);}
+@keyframes hbd1{0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(-6%,9%) scale(1.07)} 50%{transform:translate(-12%,2%) scale(.95)} 75%{transform:translate(-3%,-7%) scale(1.05)}}
+@keyframes hbd2{0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(9%,-8%) scale(1.09)} 66%{transform:translate(4%,13%) scale(.93)}}
+@keyframes hbd3{0%,100%{transform:translate(0,0) scale(1)} 38%{transform:translate(-10%,-5%) scale(1.12)} 70%{transform:translate(7%,10%) scale(.96)}}
+@keyframes hbd4{0%,100%{transform:translate(0,0) scale(1)} 28%{transform:translate(9%,13%) scale(1.06)} 58%{transform:translate(-6%,5%) scale(.98)} 80%{transform:translate(5%,-10%) scale(1.03)}}
+@media(prefers-reduced-motion:reduce){.hero__orb{animation:none!important}}
+</style>
 </head>
 <body>
-
 <a class="skip" href="#main">Skip to content</a>
-<span class="sheet-rule left"></span>
-<span class="sheet-rule right"></span>
-
+<span class="sheet-rule left"></span><span class="sheet-rule right"></span>
 <nav class="nav">
   <span class="nav__progress"></span>
   <a href="/" class="nav__mark">Mahek<b>.</b>Jain</a>
@@ -40,142 +51,34 @@
     <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">Menu</button>
   </div>
 </nav>
-
 <main id="main">
-
   <header class="hero wrap">
-    <div class="hero__tag reveal">
-      <span class="eyebrow">Creative Designer</span>
-      <span class="eyebrow"><span class="coord">Open to</span> Graphic &amp; UX roles</span>
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__orb ho1"></div>
+      <div class="hero__orb ho2"></div>
+      <div class="hero__orb ho3"></div>
+      <div class="hero__orb ho4"></div>
     </div>
-    <h1 class="display hero__name">
-      <span class="word"><span>Mahek</span></span><br>
-      <span class="word"><span>Jain</span></span>
-    </h1>
+    <div class="hero__tag reveal"><span class="eyebrow">Creative Designer</span><span class="eyebrow"><span class="coord">Open to</span> Graphic &amp; UX roles</span></div>
+    <h1 class="display hero__name"><span class="word"><span>Mahek</span></span><br><span class="word"><span>Jain</span></span></h1>
     <p class="hero__pivot reveal" data-delay="2">From spaces people step into&nbsp;— to screens they move through.</p>
-
     <div class="hero__row reveal" data-delay="3">
       <div class="hero__meta">Discipline<b>Branding · UX · Web</b></div>
       <div class="hero__meta">Experience<b>3 years, experience design</b></div>
       <div class="hero__meta">Status<b>Open to opportunities</b></div>
       <a href="/projects" class="btn btn--crimson" data-magnet>View work <span class="arr">→</span></a>
     </div>
-
     <div class="scrollcue reveal" data-delay="3"><span class="ln"></span> Scroll</div>
   </header>
-
-  <section class="section--tight">
-    <div class="wrap">
-      <div class="stats reveal">
-        <div class="stat"><div class="stat__n"><span data-count="3">0</span><span class="suf">yr</span></div><div class="stat__k">Experience design</div></div>
-        <div class="stat"><div class="stat__n"><span data-count="40">0</span><span class="suf">+</span></div><div class="stat__k">Events &amp; builds</div></div>
-        <div class="stat"><div class="stat__n"><span data-count="3">0</span></div><div class="stat__k">Disciplines, one system</div></div>
-        <div class="stat"><div class="stat__n"><span data-count="6">0</span></div><div class="stat__k">Tools in rotation</div></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="about">
-    <div class="wrap about__grid">
-      <div class="reveal">
-        <span class="eyebrow">About <span class="coord">/ elevation</span></span>
-        <p class="lede">I spent three years turning briefs into experiences&nbsp;— luxury weddings, social events, and the moodboards, branding and spatial systems behind them.</p>
-        <p class="muted measure" style="margin-top:1.5rem">What I learned designing rooms turns out to be exactly what digital design asks for: understand the person you are designing for, build a system that holds together, and guide them through it with intention. I am now bringing that thinking to branding, web and UX&nbsp;— and this site is the first piece of evidence.</p>
-        <p style="margin-top:1.75rem"><a class="ulink" href="/about">Read the full story <span class="arr">→</span></a></p>
-      </div>
-      <div class="about__bridge reveal" data-delay="1">
-        <span class="eyebrow"><span class="coord">Same discipline,</span> new medium</span>
-        <div class="bridge-row"><span>Spatial layout</span><span class="to">→</span><span>Information architecture</span></div>
-        <div class="bridge-row"><span>Décor &amp; moodboards</span><span class="to">→</span><span>Visual &amp; brand systems</span></div>
-        <div class="bridge-row"><span>Concept to execution</span><span class="to">→</span><span>Design process</span></div>
-        <div class="bridge-row"><span>Guiding a guest</span><span class="to">→</span><span>Guiding a user</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section band" id="capabilities">
-    <div class="wrap">
-      <div class="head reveal">
-        <span class="eyebrow">Capabilities <span class="coord">/ plan</span></span>
-        <h2 class="h2">What I bring, grouped by how it is built.</h2>
-      </div>
-      <div class="caps reveal" data-delay="1">
-        <div class="cap"><div class="cap__no">A — Foundations</div><div class="cap__title">Craft</div><ul class="cap__list"><li>Typography &amp; layout</li><li>Branding &amp; identity design</li><li>Composition &amp; visual hierarchy</li></ul></div>
-        <div class="cap"><div class="cap__no">B — Systems</div><div class="cap__title">Structure</div><ul class="cap__list"><li>Design systems &amp; component libraries</li><li>Design ops</li><li>Consistency at scale</li></ul></div>
-        <div class="cap"><div class="cap__no">C — Digital</div><div class="cap__title">Product</div><ul class="cap__list"><li>UI/UX &amp; web design</li><li>AI-assisted design</li><li>Responsive thinking</li></ul></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="marquee reveal" aria-hidden="true">
-    <div class="marquee__track">
-      <span>Typography</span><span>Brand systems</span><span>UX</span><span>Wayfinding</span><span>Art direction</span><span>Web design</span><span>Moodboards</span><span>Design ops</span>
-      <span>Typography</span><span>Brand systems</span><span>UX</span><span>Wayfinding</span><span>Art direction</span><span>Web design</span><span>Moodboards</span><span>Design ops</span>
-    </div>
-  </div>
-
-  <section class="section" id="toolkit">
-    <div class="wrap">
-      <div class="head reveal"><span class="eyebrow">Toolkit <span class="coord">/ instruments</span></span><h2 class="h2">The instruments.</h2></div>
-      <div class="tools reveal" data-delay="1">
-        <div class="tool"><b>Ai</b><span>Illustrator</span></div>
-        <div class="tool"><b>Ps</b><span>Photoshop</span></div>
-        <div class="tool"><b>Xd</b><span>Adobe XD</span></div>
-        <div class="tool"><b>Fi</b><span>Figma</span></div>
-        <div class="tool"><b>Cv</b><span>Canva</span></div>
-        <div class="tool"><b>Cl</b><span>Claude Design</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section band" id="experience">
-    <div class="wrap">
-      <div class="head reveal"><span class="eyebrow">Experience <span class="coord">/ chronology</span></span><h2 class="h2">Where the craft was built.</h2></div>
-      <div class="exp reveal" data-delay="1">
-        <div class="exp__row"><div class="exp__when">2023 — 2026</div><div><div class="exp__role">Design Associate</div><div class="exp__org">Astraea Events</div><p class="exp__desc">Led creative direction and execution for luxury weddings and social events, owning the work from first concept through final build.</p></div></div>
-        <div class="exp__row"><div class="exp__when">2022 — 2023</div><div><div class="exp__role">Event Designer</div><div class="exp__org">Golden Chariot</div><p class="exp__desc">Developed event themes, moodboards and décor concepts&nbsp;— working across architectural planning, space visualization and layout development.</p></div></div>
-      </div>
-      <p style="margin-top:2rem"><a class="ulink" href="/work">See the full timeline <span class="arr">→</span></a></p>
-    </div>
-  </section>
-
-  <section class="section" id="work">
-    <div class="wrap">
-      <div class="head reveal"><span class="eyebrow">Selected Work <span class="coord">/ index</span></span><h2 class="h2">Three projects, three kinds of thinking.</h2><p class="muted measure" style="margin-top:0.5rem">Branding, digital and spatial&nbsp;— each opens as its own case study.</p></div>
-      <div class="work__grid">
-        <a class="pcard reveal" href="/projects/branding"><div class="pcard__no">P/01</div><div class="pcard__body"><span class="pcard__cat">Branding &amp; Identity</span><span class="pcard__title">Identity System</span><span class="pcard__line">A coherent voice built from type, palette and components&nbsp;— a brand that holds together across every touchpoint.</span></div><span class="pcard__cta">View project <span class="arr">→</span></span></a>
-        <a class="pcard reveal" data-delay="1" href="/projects/digital"><div class="pcard__no">P/02</div><div class="pcard__body"><span class="pcard__cat">UX &amp; Web Design</span><span class="pcard__title">This Website</span><span class="pcard__line">A design system rendered as a living site&nbsp;— the strongest proof that the pivot into digital is already done.</span></div><span class="pcard__cta">View project <span class="arr">→</span></span></a>
-        <a class="pcard reveal" data-delay="2" href="/projects/spatial"><div class="pcard__no">P/03</div><div class="pcard__body"><span class="pcard__cat">Event &amp; Spatial Design</span><span class="pcard__title">Experience Design</span><span class="pcard__line">Moodboard to floor plan to built space&nbsp;— guiding hundreds of guests through a moment, by design.</span></div><span class="pcard__cta">View project <span class="arr">→</span></span></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section legend" id="system">
-    <div class="wrap">
-      <div class="head reveal"><span class="eyebrow">Design System <span class="coord">/ legend</span></span><h2 class="h2">The legend for this sheet.</h2><p class="muted measure" style="margin-top:0.5rem">Every choice on this site is a decision, not a default. The same tokens run across every page&nbsp;— and the theme toggle in the nav proves it: only the token block changes, never a component.</p></div>
-      <div class="legend__grid reveal" data-delay="1">
-        <div class="spec"><div class="spec__label"><span>01 — Palette</span><span>Four tones</span></div><div class="swatches"><div class="sw"><div class="sw__chip" style="background:#5A1625"></div><div class="sw__meta"><b>Burgundy</b><span>#5A1625</span></div></div><div class="sw"><div class="sw__chip" style="background:#EAC7D3"></div><div class="sw__meta"><b>Blush Pink</b><span>#EAC7D3</span></div></div><div class="sw"><div class="sw__chip" style="background:#F5EDE5"></div><div class="sw__meta"><b>Warm Cream</b><span>#F5EDE5</span></div></div><div class="sw"><div class="sw__chip" style="background:#D8C6B8"></div><div class="sw__meta"><b>Soft Beige</b><span>#D8C6B8</span></div></div></div><p class="spec__note">Burgundy carries the event &amp; wedding heritage&nbsp;— it anchors the nav, headlines and buttons. Blush, cream and beige are the soft, warm canvas it sits on: feminine, editorial, and unmistakably premium.</p></div>
-        <div class="spec"><div class="spec__label"><span>02 — Type</span><span>Three roles</span></div><div class="scale"><div class="scale__row"><span class="k">Display</span><span class="v" style="font-size:1.9rem">Cormorant Garamond</span></div><div class="scale__row"><span class="k">Body</span><span class="v" style="font-family:var(--body);font-size:1.4rem">Inter</span></div><div class="scale__row"><span class="k">Accent</span><span class="v" style="font-family:var(--serif);font-style:italic;font-size:1.5rem">Playfair Display</span></div></div><p class="spec__note">An elegant high-contrast serif for dominant headlines, a clean sans for clarity, and an italic serif for the small, curated accent words. Size jumps do the work of hierarchy.</p></div>
-        <div class="spec"><div class="spec__label"><span>03 — Space</span><span>8px rhythm</span></div><div class="tokens"><div class="trow"><span>Base unit</span><b>8 px</b></div><div class="trow"><span>Scale</span><b>×1 ×2 ×3 ×4 ×6 ×9</b></div><div class="trow"><span>Max width</span><b>1200 px</b></div><div class="trow"><span>Corner radius</span><b>16 px — soft, editorial</b></div></div><p class="spec__note">Rounded cards, generous whitespace and soft shadows let every section breathe&nbsp;— floating blocks on a warm canvas, the same curated logic an event needs and a screen needs.</p></div>
-        <div class="spec"><div class="spec__label"><span>04 — Motion</span><span>Restraint</span></div><div class="tokens"><div class="trow"><span>Reveal</span><b>fade + 22px rise</b></div><div class="trow"><span>Easing</span><b>cubic-bezier(.22,1,.36,1)</b></div><div class="trow"><span>Hover</span><b>lift · draw · magnet</b></div><div class="trow"><span>Reduced motion</span><b>fully respected</b></div></div><p class="spec__note">Motion confirms an action or rewards attention&nbsp;— never decorates. Turn on "reduce motion" and the site stays perfectly usable.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section contact" id="contact">
-    <div class="wrap">
-      <span class="eyebrow reveal" style="justify-content:center">Contact <span class="coord">/ datum</span></span>
-      <h2 class="contact__big display reveal" data-delay="1"><a href="mailto:mahekjain324@gmail.com">Let's build<br>something.</a></h2>
-      <div class="contact__row reveal" data-delay="2">
-        <a class="ulink" href="mailto:mahekjain324@gmail.com">mahekjain324@gmail.com</a>
-        <a class="ulink" href="tel:+917801956285">+91 78019 56285</a>
-        <a class="ulink" href="/contact">All channels →</a>
-      </div>
-    </div>
-  </section>
-
+  <section class="section--tight"><div class="wrap"><div class="stats reveal"><div class="stat"><div class="stat__n"><span data-count="3">0</span><span class="suf">yr</span></div><div class="stat__k">Experience design</div></div><div class="stat"><div class="stat__n"><span data-count="40">0</span><span class="suf">+</span></div><div class="stat__k">Events &amp; builds</div></div><div class="stat"><div class="stat__n"><span data-count="3">0</span></div><div class="stat__k">Disciplines, one system</div></div><div class="stat"><div class="stat__n"><span data-count="6">0</span></div><div class="stat__k">Tools in rotation</div></div></div></div></section>
+  <section class="section" id="about"><div class="wrap about__grid"><div class="reveal"><span class="eyebrow">About <span class="coord">/ elevation</span></span><p class="lede">I spent three years turning briefs into experiences&nbsp;— luxury weddings, social events, and the moodboards, branding and spatial systems behind them.</p><p class="muted measure" style="margin-top:1.5rem">I am now bringing that thinking to branding, web and UX&nbsp;— and this site is the first piece of evidence.</p><p style="margin-top:1.75rem"><a class="ulink" href="/about">Read the full story <span class="arr">→</span></a></p></div><div class="about__bridge reveal" data-delay="1"><span class="eyebrow"><span class="coord">Same discipline,</span> new medium</span><div class="bridge-row"><span>Spatial layout</span><span class="to">→</span><span>Information architecture</span></div><div class="bridge-row"><span>Décor &amp; moodboards</span><span class="to">→</span><span>Visual &amp; brand systems</span></div><div class="bridge-row"><span>Concept to execution</span><span class="to">→</span><span>Design process</span></div><div class="bridge-row"><span>Guiding a guest</span><span class="to">→</span><span>Guiding a user</span></div></div></div></section>
+  <section class="section band" id="capabilities"><div class="wrap"><div class="head reveal"><span class="eyebrow">Capabilities <span class="coord">/ plan</span></span><h2 class="h2">What I bring, grouped by how it is built.</h2></div><div class="caps reveal" data-delay="1"><div class="cap"><div class="cap__no">A — Foundations</div><div class="cap__title">Craft</div><ul class="cap__list"><li>Typography &amp; layout</li><li>Branding &amp; identity design</li><li>Composition &amp; visual hierarchy</li></ul></div><div class="cap"><div class="cap__no">B — Systems</div><div class="cap__title">Structure</div><ul class="cap__list"><li>Design systems &amp; component libraries</li><li>Design ops</li><li>Consistency at scale</li></ul></div><div class="cap"><div class="cap__no">C — Digital</div><div class="cap__title">Product</div><ul class="cap__list"><li>UI/UX &amp; web design</li><li>AI-assisted design</li><li>Responsive thinking</li></ul></div></div></div></section>
+  <div class="marquee reveal" aria-hidden="true"><div class="marquee__track"><span>Typography</span><span>Brand systems</span><span>UX</span><span>Wayfinding</span><span>Art direction</span><span>Web design</span><span>Moodboards</span><span>Design ops</span><span>Typography</span><span>Brand systems</span><span>UX</span><span>Wayfinding</span><span>Art direction</span><span>Web design</span><span>Moodboards</span><span>Design ops</span></div></div>
+  <section class="section" id="toolkit"><div class="wrap"><div class="head reveal"><span class="eyebrow">Toolkit <span class="coord">/ instruments</span></span><h2 class="h2">The instruments.</h2></div><div class="tools reveal" data-delay="1"><div class="tool"><b>Ai</b><span>Illustrator</span></div><div class="tool"><b>Ps</b><span>Photoshop</span></div><div class="tool"><b>Xd</b><span>Adobe XD</span></div><div class="tool"><b>Fi</b><span>Figma</span></div><div class="tool"><b>Cv</b><span>Canva</span></div><div class="tool"><b>Cl</b><span>Claude Design</span></div></div></div></section>
+  <section class="section band" id="experience"><div class="wrap"><div class="head reveal"><span class="eyebrow">Experience <span class="coord">/ chronology</span></span><h2 class="h2">Where the craft was built.</h2></div><div class="exp reveal" data-delay="1"><div class="exp__row"><div class="exp__when">2023 — 2026</div><div><div class="exp__role">Design Associate</div><div class="exp__org">Astraea Events</div><p class="exp__desc">Led creative direction and execution for luxury weddings and social events.</p></div></div><div class="exp__row"><div class="exp__when">2022 — 2023</div><div><div class="exp__role">Event Designer</div><div class="exp__org">Golden Chariot</div><p class="exp__desc">Developed event themes, moodboards and décor concepts.</p></div></div></div><p style="margin-top:2rem"><a class="ulink" href="/work">See the full timeline <span class="arr">→</span></a></p></div></section>
+  <section class="section" id="work"><div class="wrap"><div class="head reveal"><span class="eyebrow">Selected Work <span class="coord">/ index</span></span><h2 class="h2">Three projects, three kinds of thinking.</h2></div><div class="work__grid"><a class="pcard reveal" href="/projects/branding"><div class="pcard__no">P/01</div><div class="pcard__body"><span class="pcard__cat">Branding &amp; Identity</span><span class="pcard__title">Identity System</span><span class="pcard__line">A coherent voice built from type, palette and components.</span></div><span class="pcard__cta">View project <span class="arr">→</span></span></a><a class="pcard reveal" data-delay="1" href="/projects/digital"><div class="pcard__no">P/02</div><div class="pcard__body"><span class="pcard__cat">UX &amp; Web Design</span><span class="pcard__title">This Website</span><span class="pcard__line">A design system rendered as a living site.</span></div><span class="pcard__cta">View project <span class="arr">→</span></span></a><a class="pcard reveal" data-delay="2" href="/projects/spatial"><div class="pcard__no">P/03</div><div class="pcard__body"><span class="pcard__cat">Event &amp; Spatial Design</span><span class="pcard__title">Experience Design</span><span class="pcard__line">Moodboard to floor plan to built space.</span></div><span class="pcard__cta">View project <span class="arr">→</span></span></a></div></div></section>
+  <section class="section contact" id="contact"><div class="wrap"><span class="eyebrow reveal" style="justify-content:center">Contact <span class="coord">/ datum</span></span><h2 class="contact__big display reveal" data-delay="1"><a href="mailto:mahekjain324@gmail.com">Let’s build<br>something.</a></h2><div class="contact__row reveal" data-delay="2"><a class="ulink" href="mailto:mahekjain324@gmail.com">mahekjain324@gmail.com</a><a class="ulink" href="tel:+917801956285">+91 78019 56285</a><a class="ulink" href="/contact">All channels →</a></div></div></section>
 </main>
-
 <footer class="wrap"><div class="foot"><span>Mahek Jain — Creative Designer</span><span>Designed &amp; built by hand · 2026</span></div></footer>
 <script src="/main.js?v=13"></script>
 </body>
