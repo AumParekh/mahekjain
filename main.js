@@ -329,6 +329,102 @@
     })();
   })();
 
+  /* --- active nav via aria-current --- */
+  document.querySelectorAll('nav a[href]').forEach(function (link) {
+    try {
+      var linkPath = new URL(link.getAttribute('href'), window.location.href).pathname;
+      if (linkPath === window.location.pathname) {
+        link.setAttribute('aria-current', 'page');
+      }
+    } catch (e) {}
+  });
+
+  /* --- animated bridge rows --- */
+  (function () {
+    var rows = document.querySelectorAll('.bridge-row');
+    if (!rows.length || reduce) return;
+    rows.forEach(function (row, i) {
+      row.style.opacity = '0';
+      row.style.transform = 'translateY(18px)';
+      row.style.transition = 'opacity 0.55s cubic-bezier(.22,1,.36,1) ' + (i * 110) + 'ms, transform 0.55s cubic-bezier(.22,1,.36,1) ' + (i * 110) + 'ms';
+      new IntersectionObserver(function (entries, obs) {
+        if (entries[0].isIntersecting) {
+          entries[0].target.style.opacity = '1';
+          entries[0].target.style.transform = 'translateY(0)';
+          obs.disconnect();
+        }
+      }, { threshold: 0.15 }).observe(row);
+    });
+  })();
+
+  /* --- custom cursor dot --- */
+  (function () {
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+    if (reduce) return;
+    var cursor = document.createElement('div');
+    cursor.id = 'mj-cursor';
+    Object.assign(cursor.style, {
+      position: 'fixed', width: '10px', height: '10px',
+      background: '#5A1625', borderRadius: '50%',
+      pointerEvents: 'none', zIndex: '99999',
+      left: '0px', top: '0px',
+      transform: 'translate(-50%,-50%)',
+      willChange: 'left,top', mixBlendMode: 'multiply',
+      transition: 'width 0.2s cubic-bezier(.22,1,.36,1), height 0.2s cubic-bezier(.22,1,.36,1), opacity 0.3s ease',
+      opacity: '0'
+    });
+    document.body.appendChild(cursor);
+    document.body.style.cursor = 'none';
+    var mx = 0, my = 0, cx = 0, cy = 0;
+    document.addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; cursor.style.opacity = '1'; });
+    document.addEventListener('mouseleave', function () { cursor.style.opacity = '0'; });
+    document.addEventListener('mouseenter', function () { cursor.style.opacity = '1'; });
+    function onEnter() { cursor.style.width = '24px'; cursor.style.height = '24px'; cursor.style.opacity = '0.45'; }
+    function onLeave() { cursor.style.width = '10px'; cursor.style.height = '10px'; cursor.style.opacity = '1'; }
+    document.querySelectorAll('a, button, [role="button"], label').forEach(function (el) {
+      el.style.cursor = 'none';
+      el.addEventListener('mouseenter', onEnter);
+      el.addEventListener('mouseleave', onLeave);
+    });
+    var lerp = function (a, b, t) { return a + (b - a) * t; };
+    (function animate() {
+      cx = lerp(cx, mx, 0.14); cy = lerp(cy, my, 0.14);
+      cursor.style.left = cx + 'px'; cursor.style.top = cy + 'px';
+      requestAnimationFrame(animate);
+    })();
+  })();
+
+  /* --- favicon pulse on tab hide --- */
+  (function () {
+    var faviconEl = document.querySelector('link[rel~="icon"]');
+    var originalHref = faviconEl ? faviconEl.href : null;
+    var canvas = document.createElement('canvas');
+    canvas.width = 32; canvas.height = 32;
+    var ctx = canvas.getContext('2d');
+    var frame = 0, animId = null;
+    function drawDot(o) {
+      ctx.clearRect(0, 0, 32, 32);
+      ctx.beginPath(); ctx.arc(16, 16, 11, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(90,22,37,' + o + ')'; ctx.fill();
+    }
+    function startPulse() {
+      frame = 0;
+      (function pulse() {
+        frame++;
+        drawDot(0.35 + 0.65 * Math.abs(Math.sin(frame * 0.07)));
+        if (faviconEl) faviconEl.href = canvas.toDataURL('image/png');
+        animId = requestAnimationFrame(pulse);
+      })();
+    }
+    function stopPulse() {
+      if (animId) cancelAnimationFrame(animId);
+      if (faviconEl && originalHref) faviconEl.href = originalHref;
+    }
+    document.addEventListener('visibilitychange', function () {
+      document.hidden ? startPulse() : stopPulse();
+    });
+  })();
+
   /* --- page transitions: crimson veil --- */
   (function () {
     if (reduce) return;
