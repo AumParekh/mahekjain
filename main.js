@@ -15,7 +15,6 @@
       b.setAttribute("aria-label", t === "dark" ? "Switch to light theme" : "Switch to dark theme");
     });
   }
-  // initial theme is applied by an inline script in <head> to avoid a flash.
   document.querySelectorAll("[data-theme-toggle]").forEach(function (btn) {
     btn.addEventListener("click", function () {
       setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
@@ -138,13 +137,7 @@
     Object.keys(map).forEach(function (id) { sio.observe(document.getElementById(id)); });
   }
 
-  /* --- 3D wireframe globe — real WebGL, on every page --------------------
-     Raw WebGL (no engine, no library): an MVP matrix + GLSL shaders draw a
-     lat/long sphere as gl.LINES — a spatial form in true 3D, the site's
-     thesis made literal, in every page's hero. Reduced motion -> one static
-     frame. Where WebGL is unavailable it falls back to a 2D-canvas
-     projection of the same sphere. Injected via JS so the no-JS hero stays
-     clean; hidden < 760px; pauses while the hero is off-screen. */
+  /* --- 3D wireframe globe --- */
   (function () {
     var host = document.querySelector(".hero, .page-hero, .cs-hero");
     if (!host) return;
@@ -155,7 +148,6 @@
     cv.setAttribute("aria-hidden", "true");
     host.appendChild(cv);
 
-    /* theme-aware colours as 0..1 rgb, refreshed when the token block swaps */
     function hexRGB(h) {
       h = (h || "").trim().replace("#", "");
       if (h.length === 3) h = h[0]+h[0] + h[1]+h[1] + h[2]+h[2];
@@ -174,7 +166,6 @@
       attributes: true, attributeFilter: ["data-theme"]
     });
 
-    /* lat/long sphere -> flat array of line-segment vertex pairs */
     var NLAT = 9, NLON = 14, SEG = 44, segs = [];
     function ring(fn) {
       var prev = null, i, p;
@@ -201,7 +192,6 @@
       tX = (e.clientY/window.innerHeight - 0.5) * 0.4;
     }, { passive: true });
 
-    /* 4x4 column-major matrix helpers (gl-matrix conventions) */
     function mul(a, b) {
       var o = new Float32Array(16), i, b0, b1, b2, b3;
       for (i = 0; i < 4; i++) {
@@ -289,13 +279,13 @@
         gl.uniformMatrix4fv(uP, false, persp(0.92, cv.width/cv.height, 0.1, 100));
         gl.uniform1f(uDist, dist);
         gl.enableVertexAttribArray(aPos);
-        gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);                 // wireframe
+        gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);
         gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
         gl.uniform1f(uPt, 0.0);
         gl.uniform1f(uBase, 0.34);
         gl.uniform3f(uColor, col.line[0], col.line[1], col.line[2]);
         gl.drawArrays(gl.LINES, 0, GEO.length/3);
-        gl.bindBuffer(gl.ARRAY_BUFFER, poleBuf);                 // crimson poles
+        gl.bindBuffer(gl.ARRAY_BUFFER, poleBuf);
         gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
         gl.uniform1f(uPt, 6.0 * dpr);
         gl.uniform1f(uBase, 0.95);
@@ -303,7 +293,6 @@
         gl.drawArrays(gl.POINTS, 0, 2);
       };
     } else {
-      /* no WebGL: project the same sphere onto a 2D canvas */
       var pts = [], gi;
       for (gi = 0; gi < GEO.length; gi += 3) pts.push([GEO[gi], GEO[gi+1], GEO[gi+2]]);
       draw = function () {
@@ -330,7 +319,7 @@
       };
     }
 
-    if (reduce) { draw(); return; }              // single static frame
+    if (reduce) { draw(); return; }
     var on = true;
     if ("IntersectionObserver" in window)
       new IntersectionObserver(function (en) { on = en[0].isIntersecting; }).observe(host);
@@ -339,4 +328,63 @@
       requestAnimationFrame(loop);
     })();
   })();
+
+  /* --- page transitions: crimson veil --- */
+  (function () {
+    if (reduce) return;
+    var style = document.createElement('style');
+    style.textContent =
+      '#mj-veil{position:fixed;inset:0;z-index:9998;background:#5A1625;' +
+      'transform:translateX(-100%);will-change:transform;pointer-events:none;' +
+      'display:flex;align-items:center;justify-content:center;}' +
+      '#mj-veil .veil-mark{' +
+      'font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;' +
+      'font-weight:300;font-size:clamp(2rem,6vw,4rem);letter-spacing:.25em;' +
+      'color:rgba(244,240,235,0.28);opacity:0;transition:opacity .3s ease 0s;}' +
+      '#mj-veil.veil-on .veil-mark{opacity:1;transition-delay:.12s;}';
+    document.head.appendChild(style);
+    var veil = document.createElement('div');
+    veil.id = 'mj-veil';
+    veil.innerHTML = '<span class="veil-mark">Mahek.</span>';
+    document.body.appendChild(veil);
+    var EASE = 'cubic-bezier(0.76,0,0.24,1)';
+    function revealPage() {
+      if (sessionStorage.getItem('mj-veil') !== '1') return;
+      sessionStorage.removeItem('mj-veil');
+      veil.style.transition = 'none';
+      veil.style.transform = 'translateX(0)';
+      veil.classList.add('veil-on');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          veil.style.transition = 'transform 520ms ' + EASE;
+          veil.style.transform = 'translateX(100%)';
+          veil.classList.remove('veil-on');
+        });
+      });
+    }
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href.charAt(0) !== '/' || a.target === '_blank') return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      veil.style.transition = 'none';
+      veil.style.transform = 'translateX(-100%)';
+      veil.style.pointerEvents = 'all';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          veil.style.transition = 'transform 440ms ' + EASE;
+          veil.style.transform = 'translateX(0)';
+          veil.classList.add('veil-on');
+          setTimeout(function () {
+            sessionStorage.setItem('mj-veil', '1');
+            window.location.href = href;
+          }, 450);
+        });
+      });
+    });
+    revealPage();
+  })();
+
 })();
