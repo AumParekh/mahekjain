@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&family=Playfair+Display:wght@400&display=swap" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <style>
 /* ─── RESET ─────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -62,95 +61,82 @@ a.underline-link:hover::after { width: 100%; }
 
 /* ─── MENU OVERLAY ───────────────────────────────────────── */
 .menu-overlay {
-  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 200;
-  background: #191919;
+  position: fixed; inset: 0; z-index: 200;
+  background: #191919; color: #EFEDEA;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.4s cubic-bezier(.82,0,.18,1), visibility 0.4s cubic-bezier(.82,0,.18,1);
   overflow: hidden;
-  visibility: hidden; pointer-events: none; opacity: 0;
 }
-.menu-overlay.is-active { visibility: visible; pointer-events: all; }
+.menu-overlay.show { opacity: 1; visibility: visible; }
 
-/* Centered-right stack */
+/* Centered stack */
 .menu-stack {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-40%, -50%);
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
 }
 
-/* Each row — block, position:relative for label positioning */
-.menu-row { position: relative; line-height: 0.83; }
+/* Each row */
+.menu-row {
+  position: relative;
+  transform: translateY(60px); opacity: 0;
+  transition: transform 1s cubic-bezier(.82,0,.18,1), opacity 1s cubic-bezier(.82,0,.18,1);
+  transition-delay: calc((5 - var(--i, 0)) * 80ms);
+}
+.menu-overlay.show .menu-row { transform: translateY(0); opacity: 1; }
 
-/* word-outer: inline-block — its width = the word width.
-   Serif labels are positioned absolute relative to this. */
-.word-outer { position: relative; display: inline-block; }
-
-/* The overflow mask (stays static, not animated) */
-.row-clip { overflow: hidden; display: block; }
-
-/* The word element — GSAP yPercent targets this */
+/* Giant word */
 .menu-word {
-  display: block;
+  display: inline-block; position: relative;
   font-family: 'Kumbh Sans', sans-serif; font-weight: 700;
-  font-size: clamp(52px, 9.5vw, 120px);
-  line-height: 0.83; letter-spacing: -0.04em; text-transform: uppercase;
-  color: #EFEDEA; text-decoration: none; white-space: nowrap;
+  font-size: clamp(44px, 8vw, 110px);
+  line-height: 0.86; letter-spacing: -0.04em; text-transform: uppercase;
+  color: #EFEDEA; text-decoration: none; cursor: crosshair;
 }
-.menu-word--contact { font-size: clamp(60px, 11vw, 140px); }
 
-/* Card-flip hover: original exits up, duplicate enters from below */
-.menu-word-wrap { position: relative; overflow: hidden; display: block; }
-.word-a {
-  display: block;
-  transform: translateY(0);
-  transition: transform 0.55s cubic-bezier(0.82, 0, 0.18, 1);
-}
-.word-b {
-  display: block; position: absolute; top: 0; left: 0; width: 100%;
-  transform: translateY(100%);
-  transition: transform 0.55s cubic-bezier(0.82, 0, 0.18, 1);
-}
-.menu-word:hover .word-a { transform: translateY(-100%); }
-.menu-word:hover .word-b { transform: translateY(0); }
+/* Card-flip hover */
+.card-flip { position: relative; overflow: hidden; display: block; }
+.flip-a { display: block; transform: translateY(0); transition: transform 0.7s cubic-bezier(.82,0,.18,1); }
+.flip-b { display: block; position: absolute; top: 0; left: 0; width: 100%;
+          transform: translateY(100%); transition: transform 0.7s cubic-bezier(.82,0,.18,1); }
+.menu-word:hover .flip-a { transform: translateY(-100%); }
+.menu-word:hover .flip-b { transform: translateY(0); }
 
-/* Serif aside labels — absolute, positioned outside the clip */
-.menu-serif {
-  font-family: 'Playfair Display', serif; font-weight: 400;
-  font-size: clamp(13px, 1.1vw, 16px);
-  color: #EFEDEA; white-space: nowrap;
+/* Serif asides */
+.menu-aside {
   position: absolute; top: 50%; transform: translateY(-50%);
+  font-family: 'Playfair Display', serif; font-weight: 400;
+  font-size: 15px; color: #EFEDEA; white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(.82,0,.18,1);
+  transition-delay: calc(520ms + var(--i, 0) * 60ms);
+  pointer-events: none;
 }
-.serif-l    { right: calc(100% + 48px); }
-.serif-l-far { right: calc(100% + 80px); }
-.serif-r    { left: calc(100% + 32px); }
+.menu-overlay.show .menu-aside { opacity: 0.65; }
+.aside-left  { right: 100%; margin-right: 30px; }
+.aside-right { left: 100%;  margin-left: 30px; }
 
-/* Showreel row — flex so the * ( ) elements align with the label */
-.menu-row--showreel {
-  display: flex; align-items: center; gap: 0.4vw;
-}
-.menu-showreel-inner {
-  display: flex; align-items: center; gap: 0.4vw;
-}
-.menu-star, .menu-paren {
+/* Showreel row */
+.menu-showreel { position: relative; display: inline-flex; align-items: center; gap: 0.3vw; }
+.show-star, .show-paren {
   font-family: 'Kumbh Sans', sans-serif; font-weight: 700;
-  font-size: clamp(52px, 9.5vw, 120px); line-height: 0.83;
-  color: #EFEDEA; user-select: none;
+  font-size: clamp(56px, 8vw, 96px); line-height: 0.86; color: #EFEDEA;
 }
-.menu-thumb {
-  width: clamp(60px, 8vw, 110px); aspect-ratio: 3/4;
-  background: #E3E1DE;
-}
-.menu-serif--showreel {
-  position: static; transform: none;
-  margin-left: clamp(16px, 2vw, 32px);
-}
+.show-thumb { width: clamp(80px,8vw,104px); height: clamp(80px,8vw,104px); background: #E3E1DE; }
 
 /* Bottom corner links */
 .menu-corner {
   position: absolute; bottom: 24px;
-  font-family: 'Kumbh Sans', sans-serif; font-weight: 400; font-size: 14px;
-  color: #EFEDEA;
+  font-family: 'Kumbh Sans', sans-serif; font-weight: 400; font-size: 14px; color: #EFEDEA;
+  opacity: 0; transition: opacity 0.4s cubic-bezier(.82,0,.18,1); transition-delay: 700ms;
 }
+.menu-overlay.show .menu-corner { opacity: 1; }
 .menu-corner-l { left: 24px; }
 .menu-corner-r { right: 24px; }
+a.menu-corner::after { content:''; position:absolute; bottom:0; left:0; width:0; height:1px;
+  background:#EFEDEA; transition: width 0.4s cubic-bezier(.98,0,.02,1); }
+a.menu-corner:hover::after { width: 100%; }
 
 /* ─── IMAGE FRAME MOTIF ──────────────────────────────────── */
 .image-frame {
@@ -275,9 +261,7 @@ footer { background: #191919; padding: 60px 24px; border-top: 1px solid #2a2a2a;
   .footer__cols { grid-template-columns: 1fr; }
   .image-frame img, .image-frame .img-placeholder { width: 62vw; }
   .menu-word { font-size: clamp(36px, 10vw, 80px); }
-  .menu-word--contact { font-size: clamp(40px, 12vw, 100px); }
-  .menu-stack { transform: translate(-50%, -50%); left: 50%; }
-  .menu-star, .menu-paren { font-size: clamp(36px, 10vw, 80px); }
+  .show-star, .show-paren { font-size: clamp(36px, 10vw, 80px); }
 }
 </style>
 </head>
@@ -293,84 +277,61 @@ footer { background: #191919; padding: 60px 24px; border-top: 1px solid #2a2a2a;
 <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
   <div class="menu-stack">
 
-    <!-- ROW 1: INDEX  — serif "Home" LEFT -->
-    <div class="menu-row">
-      <div class="word-outer">
-        <div class="row-clip">
-          <a href="#hero" class="menu-word" id="word-index" data-menu-link>
-            <div class="menu-word-wrap"><span class="word-a">Index</span><span class="word-b">Index</span></div>
-          </a>
-        </div>
-        <span class="menu-serif serif-l" id="serif-home">Home</span>
+    <!-- INDEX — aside LEFT -->
+    <div class="menu-row" style="--i:0">
+      <a href="#hero" class="menu-word" data-menu-link>
+        <span class="menu-aside aside-left">Home</span>
+        <div class="card-flip"><span class="flip-a">Index</span><span class="flip-b">Index</span></div>
+      </a>
+    </div>
+
+    <!-- ABOUT — aside RIGHT -->
+    <div class="menu-row" style="--i:1">
+      <a href="#about" class="menu-word" data-menu-link>
+        <span class="menu-aside aside-right">Who I am</span>
+        <div class="card-flip"><span class="flip-a">About</span><span class="flip-b">About</span></div>
+      </a>
+    </div>
+
+    <!-- PROJECTS — aside LEFT -->
+    <div class="menu-row" style="--i:2">
+      <a href="#projects" class="menu-word" data-menu-link>
+        <span class="menu-aside aside-left">Selected work</span>
+        <div class="card-flip"><span class="flip-a">Projects</span><span class="flip-b">Projects</span></div>
+      </a>
+    </div>
+
+    <!-- * ( ) SHOWREEL — aside RIGHT -->
+    <div class="menu-row" style="--i:3">
+      <div class="menu-showreel">
+        <span class="menu-aside aside-right">Showreel</span>
+        <span class="show-star">*</span>
+        <span class="show-paren">(</span>
+        <div class="show-thumb"></div>
+        <span class="show-paren">)</span>
       </div>
     </div>
 
-    <!-- ROW 2: ABOUT  — serif "Who I am" RIGHT -->
-    <div class="menu-row">
-      <div class="word-outer">
-        <div class="row-clip">
-          <a href="#about" class="menu-word" id="word-about" data-menu-link>
-            <div class="menu-word-wrap"><span class="word-a">About</span><span class="word-b">About</span></div>
-          </a>
-        </div>
-        <span class="menu-serif serif-r" id="serif-whoiam">Who I am</span>
-      </div>
+    <!-- EXPERIENCE — aside RIGHT -->
+    <div class="menu-row" style="--i:4">
+      <a href="#experience" class="menu-word" data-menu-link>
+        <span class="menu-aside aside-right">Timeline</span>
+        <div class="card-flip"><span class="flip-a">Experience</span><span class="flip-b">Experience</span></div>
+      </a>
     </div>
 
-    <!-- ROW 3: PROJECTS  — serif "Selected work" LEFT (far) -->
-    <div class="menu-row">
-      <div class="word-outer">
-        <div class="row-clip">
-          <a href="#projects" class="menu-word" id="word-projects" data-menu-link>
-            <div class="menu-word-wrap"><span class="word-a">Projects</span><span class="word-b">Projects</span></div>
-          </a>
-        </div>
-        <span class="menu-serif serif-l-far" id="serif-selectedwork">Selected work</span>
-      </div>
-    </div>
-
-    <!-- ROW 4: * ( image )  — serif "Showreel" RIGHT (inline) -->
-    <div class="menu-row menu-row--showreel">
-      <div class="row-clip">
-        <div class="menu-showreel-inner" id="word-showreel">
-          <span class="menu-star">*</span>
-          <span class="menu-paren">(</span>
-          <div class="menu-thumb"></div>
-          <span class="menu-paren">)</span>
-        </div>
-      </div>
-      <span class="menu-serif menu-serif--showreel" id="serif-showreel">Showreel</span>
-    </div>
-
-    <!-- ROW 5: EXPERIENCE  — serif "Timeline" RIGHT -->
-    <div class="menu-row">
-      <div class="word-outer">
-        <div class="row-clip">
-          <a href="#experience" class="menu-word" id="word-experience" data-menu-link>
-            <div class="menu-word-wrap"><span class="word-a">Experience</span><span class="word-b">Experience</span></div>
-          </a>
-        </div>
-        <span class="menu-serif serif-r" id="serif-timeline">Timeline</span>
-      </div>
-    </div>
-
-    <!-- ROW 6: CONTACT  — larger size, serif "Get in touch" RIGHT -->
-    <div class="menu-row">
-      <div class="word-outer">
-        <div class="row-clip">
-          <a href="#contact" class="menu-word menu-word--contact" id="word-contact" data-menu-link>
-            <div class="menu-word-wrap"><span class="word-a">Contact</span><span class="word-b">Contact</span></div>
-          </a>
-        </div>
-        <span class="menu-serif serif-r" id="serif-getintouch">Get in touch</span>
-      </div>
+    <!-- CONTACT — aside LEFT, "Say hello" -->
+    <div class="menu-row" style="--i:5">
+      <a href="#contact" class="menu-word" data-menu-link>
+        <span class="menu-aside aside-left">Say hello</span>
+        <div class="card-flip"><span class="flip-a">Contact</span><span class="flip-b">Contact</span></div>
+      </a>
     </div>
 
   </div>
 
-  <!-- Bottom corner links -->
-  <a href="mailto:mahekjain324@gmail.com" class="menu-corner menu-corner-l" id="menu-email">( Email )</a>
-  <a href="https://www.linkedin.com/in/mahek-jain-547782246" target="_blank" class="menu-corner menu-corner-r" id="menu-linkedin">( LinkedIn )</a>
+  <a href="mailto:mahekjain324@gmail.com" class="menu-corner menu-corner-l">( Email )</a>
+  <a href="https://www.linkedin.com/in/mahek-jain-547782246" target="_blank" class="menu-corner menu-corner-r">( LinkedIn )</a>
 </div>
 
 <!-- ─── HERO ─────────────────────────────────────────────── -->
@@ -690,75 +651,32 @@ footer { background: #191919; padding: 60px 24px; border-top: 1px solid #2a2a2a;
 (function () {
   'use strict';
 
-  /* ── MENU — GSAP-powered open / close ──────────────────── */
-  const overlay    = document.getElementById('menuOverlay');
-  const menuBtn    = document.getElementById('menuBtn');
-  const menuLinks  = document.querySelectorAll('[data-menu-link]');
+  /* ── MENU — CSS-transition open / close ────────────────── */
+  const overlay   = document.getElementById('menuOverlay');
+  const menuBtn   = document.getElementById('menuBtn');
+  const menuLinks = document.querySelectorAll('[data-menu-link]');
 
-  // Word elements that slide in/out
-  const wordIndex      = document.getElementById('word-index');
-  const wordAbout      = document.getElementById('word-about');
-  const wordProjects   = document.getElementById('word-projects');
-  const wordShowreel   = document.getElementById('word-showreel');
-  const wordExperience = document.getElementById('word-experience');
-  const wordContact    = document.getElementById('word-contact');
-  const allWords       = [wordIndex, wordAbout, wordProjects, wordShowreel, wordExperience, wordContact];
-
-  // Serif labels + corner links
-  const allSerifs  = document.querySelectorAll('.menu-serif');
-  const allCorners = document.querySelectorAll('.menu-corner');
-
-  // Set initial states
-  gsap.set(overlay, { autoAlpha: 0 });
-  gsap.set(allWords, { yPercent: 110 });
-  gsap.set([...allSerifs, ...allCorners], { opacity: 0 });
-
-  let isOpen = false;
-  let currentTl = null;
+  let menuOpen = false;
 
   function openMenu() {
-    if (currentTl) currentTl.kill();
-    isOpen = true;
+    menuOpen = true;
     menuBtn.textContent = 'Close';
+    overlay.classList.add('show');
     overlay.setAttribute('aria-hidden', 'false');
-    overlay.classList.add('is-active');
     nav.classList.add('nav-inverted');
     document.body.style.overflow = 'hidden';
-
-    currentTl = gsap.timeline();
-    currentTl
-      .to(overlay, { autoAlpha: 1, duration: 0.35, ease: 'power1.inOut' })
-      .fromTo(
-        [wordContact, wordExperience, wordShowreel, wordProjects, wordAbout, wordIndex],
-        { yPercent: 110 },
-        { yPercent: 0, duration: 1.0, ease: 'power3.inOut', stagger: 0.06 },
-        0
-      )
-      .to([...allSerifs, ...allCorners], { opacity: 0.7, duration: 0.5, ease: 'power1.out' }, 0.5);
   }
 
   function closeMenu() {
-    if (currentTl) currentTl.kill();
-    isOpen = false;
+    menuOpen = false;
     menuBtn.textContent = 'Menu';
+    overlay.classList.remove('show');
     overlay.setAttribute('aria-hidden', 'true');
     nav.classList.remove('nav-inverted');
     document.body.style.overflow = '';
-
-    currentTl = gsap.timeline({
-      onComplete: () => overlay.classList.remove('is-active')
-    });
-    currentTl
-      .to([...allSerifs, ...allCorners], { opacity: 0, duration: 0.25, ease: 'power1.in' })
-      .to(
-        [wordIndex, wordAbout, wordProjects, wordShowreel, wordExperience, wordContact],
-        { yPercent: 110, duration: 0.85, ease: 'power3.inOut', stagger: 0.055 },
-        0.1
-      )
-      .to(overlay, { autoAlpha: 0, duration: 0.35, ease: 'power1.inOut' }, 1.1);
   }
 
-  menuBtn.addEventListener('click', () => isOpen ? closeMenu() : openMenu());
+  menuBtn.addEventListener('click', () => menuOpen ? closeMenu() : openMenu());
   menuLinks.forEach(link => link.addEventListener('click', closeMenu));
 
   /* ── IntersectionObserver — page text clip reveals ──────── */
@@ -794,6 +712,7 @@ footer { background: #191919; padding: 60px 24px; border-top: 1px solid #2a2a2a;
   const darkSections = document.querySelectorAll('#disciplines, #contact, footer');
 
   const navObserver = new IntersectionObserver(() => {
+    if (menuOpen) return;
     let anyDark = false;
     darkSections.forEach(sec => {
       const r = sec.getBoundingClientRect();
