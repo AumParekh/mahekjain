@@ -115,6 +115,19 @@
     }
   }
 
+  /* --- projects page: hero line reveals (synced to preloader) */
+  var heroLines = document.querySelectorAll(".pw-hero-reveal");
+  if (heroLines.length) {
+    if (reduce) {
+      heroLines.forEach(function (line) { line.classList.add("show"); });
+    } else {
+      var heroPreDelay = sessionStorage.getItem("pre_done") ? 60 : 2200;
+      heroLines.forEach(function (line, i) {
+        setTimeout(function () { line.classList.add("show"); }, heroPreDelay + (i * 120));
+      });
+    }
+  }
+
   /* --- magnetic buttons ------------------------------------- */
   var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   if (fine && !reduce) {

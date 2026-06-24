@@ -728,6 +728,97 @@ a:focus-visible, button:focus-visible, .btn:focus-visible {
 }
 #preloader a:focus-visible { outline-color: var(--bone); }
 
+/* ---- 30. PROJECTS WORK PAGE ---------------------------------- */
+.t-serif-name {
+  font-family: var(--serif); font-weight: 500;
+  font-size: clamp(34px, 5vw, 84px); line-height: 1; letter-spacing: -0.02em;
+}
+
+/* imgfade: opacity reveal triggered by .reveal.show (IO adds .show via main.js) */
+.reveal .imgfade { opacity: 0; transition: opacity 0.8s var(--ease); }
+.reveal.show .imgfade { opacity: 1; }
+/* also trigger inside pw-hero-reveal (clip reveal handled by setTimeout in main.js) */
+.pw-hero-reveal.show .imgfade { opacity: 1; transition: opacity 0.8s var(--ease) 0.3s; }
+
+/* Hero */
+.pw-hero {
+  min-height: 100svh; background: var(--bone);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 120px 18px 60px; text-align: center;
+}
+.pw-hero__inner { display: flex; flex-direction: column; align-items: center; color: var(--black); }
+.pw-hero__spotlight {
+  display: flex; align-items: center; justify-content: center;
+  gap: calc(.05em + .4vw); position: relative;
+}
+.pw-hero__aside {
+  position: absolute; top: 50%; transform: translateY(-50%); white-space: nowrap;
+  font-family: var(--serif); font-style: italic; font-size: clamp(16px,1.5vw,24px);
+}
+.pw-hero__aside--l { right: 100%; margin-right: .6em; }
+.pw-hero__aside--r { left: 100%; margin-left: .4em; font-style: normal; }
+.pw-hero__img {
+  width: clamp(110px,14vw,180px); height: clamp(110px,14vw,180px);
+  overflow: hidden; flex: 0 0 auto; background: var(--gray);
+  border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+.pw-hero__img-label { font-size: var(--t-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+
+/* Intro statement */
+.pw-intro { background: var(--bone); padding: clamp(60px,12vh,150px) 8vw; text-align: center; }
+.pw-intro .clip { display: inline-block; }
+
+/* Portfolio entries */
+.pw-entry { background: var(--bone); padding: clamp(40px,8vh,90px) 24px; text-align: center; }
+.pw-entry__frame {
+  display: flex; align-items: center; justify-content: center;
+  gap: calc(.04em + .5vw);
+}
+.pw-entry__img {
+  display: flex; align-items: center; justify-content: center;
+  width: min(58vw,900px); aspect-ratio: 16/9;
+  overflow: hidden; flex: 0 0 auto;
+  background: var(--gray); border: 1px solid var(--line);
+  position: relative;
+  transition: opacity .4s var(--ease-out);
+}
+.pw-entry__img::before {
+  content: ""; position: absolute; inset: 12px;
+  border: 1px dashed var(--line); pointer-events: none; z-index: 1;
+}
+.pw-entry__img:hover { opacity: .85; }
+.pw-entry__img-label { font-size: var(--t-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+.pw-entry__name { margin-top: clamp(28px,4vh,52px); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.pw-entry__cat { font-size: var(--t-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+
+/* CTA — black */
+.pw-cta {
+  min-height: 80svh; background: var(--black); color: var(--bone);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 120px 8vw; text-align: center; margin-top: 60px;
+}
+.pw-cta .t-serif-xl { max-width: 1100px; line-height: 1.12; color: var(--bone); }
+.pw-cta .clip { display: inline-block; }
+.pw-cta__link {
+  display: inline-block; margin-top: clamp(36px,6vh,60px);
+  font-weight: 700; font-size: var(--t-small); letter-spacing: 0.06em;
+  text-transform: uppercase; text-decoration: underline; text-underline-offset: 6px;
+  color: var(--bone); transition: opacity .3s var(--ease-out);
+}
+.pw-cta__link:hover { opacity: .6; }
+
+@media (max-width: 820px) {
+  .pw-hero__aside { display: none; }
+  .pw-entry__img { width: min(80vw, 900px); }
+}
+@media (max-width: 480px) {
+  .pw-entry__frame { gap: .5rem; }
+  .pw-entry .t-display { font-size: clamp(32px, 8vw, 56px); }
+}
+
 /* ---- 29. PRINT ----------------------------------------------- */
 @media print {
   #preloader, .nav, .marquee, .scrollcue, .nav__progress { display: none !important; }
