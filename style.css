@@ -712,9 +712,31 @@ h1, h2, h3 { font-family: var(--display); font-weight: 700;
   .stat { opacity: 1; transform: none; }
   .marquee__track { animation: none; }
   .scrollcue .ln::after { animation: none; }
+  .pre__spin { animation: none; }
+  .nav__links a { opacity: 1; transform: none; }
+  .bridge-row { transition: none; }
+  .pcard::before { transition: none; }
+  .exp__row::before { transition: none; }
 }
 
-/* ---- 27. FOCUS ----------------------------------------------- */
+/* ---- 28. FOCUS ----------------------------------------------- */
 a:focus-visible, button:focus-visible, .btn:focus-visible {
   outline: 2px solid var(--black); outline-offset: 3px;
+}
+.band a:focus-visible, .band button:focus-visible {
+  outline-color: var(--bone);
+}
+#preloader a:focus-visible { outline-color: var(--bone); }
+
+/* ---- 29. PRINT ----------------------------------------------- */
+@media print {
+  #preloader, .nav, .marquee, .scrollcue, .nav__progress { display: none !important; }
+  body { background: #fff; color: #000; cursor: auto; font-size: 11pt; }
+  .wrap { max-width: 100%; padding-inline: 0; }
+  .section, .section--tight { padding-block: 1.5rem; }
+  a[href]::after { content: " (" attr(href) ")"; font-size: 0.8em; opacity: 0.6; }
+  .btn, .ulink { text-decoration: underline; }
+  .reveal, .stat, .word > span, .pre { opacity: 1; transform: none; }
+  .band { background: #eee; color: #000; }
+  .pcard, .cap, .exp__row { break-inside: avoid; }
 }
