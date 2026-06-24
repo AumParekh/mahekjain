@@ -43,7 +43,7 @@ a.underline-link:hover::after { width: 100%; }
 
 /* ─── NAV ────────────────────────────────────────────────── */
 .nav {
-  position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 300;
   display: flex; align-items: center; justify-content: space-between;
   padding: 20px 24px;
 }
@@ -722,6 +722,7 @@ footer { background: #191919; padding: 60px 24px; border-top: 1px solid #2a2a2a;
     menuBtn.textContent = 'Close';
     overlay.setAttribute('aria-hidden', 'false');
     overlay.classList.add('is-active');
+    nav.classList.add('nav-inverted');
     document.body.style.overflow = 'hidden';
 
     currentTl = gsap.timeline();
@@ -741,6 +742,7 @@ footer { background: #191919; padding: 60px 24px; border-top: 1px solid #2a2a2a;
     isOpen = false;
     menuBtn.textContent = 'Menu';
     overlay.setAttribute('aria-hidden', 'true');
+    nav.classList.remove('nav-inverted');
     document.body.style.overflow = '';
 
     currentTl = gsap.timeline({
