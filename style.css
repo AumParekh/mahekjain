@@ -819,6 +819,19 @@ a:focus-visible, button:focus-visible, .btn:focus-visible {
   .pw-entry .t-display { font-size: clamp(32px, 8vw, 56px); }
 }
 
+/* ---- 31. CONTACT METHOD ENTRIES (pw-entry variant for text) -- */
+.pw-cmethod {
+  display: flex; flex-direction: column; gap: 0.5rem; text-align: center;
+  padding: var(--s4) var(--s6); min-width: clamp(200px,35vw,580px);
+  transition: opacity .3s var(--ease-out);
+}
+.pw-cmethod:hover { opacity: .7; }
+.pw-cmethod__k { font-size: var(--t-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+.pw-cmethod__v { font-family: var(--display); font-weight: 700; font-size: clamp(1.1rem,2.8vw,2.2rem); letter-spacing: -0.03em; line-height: 1.1; }
+
+/* cs-cover inside pw-entry__frame (case study cover with * ( ) motif) */
+.pw-entry__frame .cs-cover { width: min(58vw,900px); flex: 0 0 auto; }
+
 /* ---- 29. PRINT ----------------------------------------------- */
 @media print {
   #preloader, .nav, .marquee, .scrollcue, .nav__progress { display: none !important; }
