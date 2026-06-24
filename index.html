@@ -42,21 +42,14 @@ a.underline-link:hover::after { width: 100%; }
 
 /* ─── NAV ────────────────────────────────────────────────── */
 .nav {
-  position: fixed; top: 0; left: 0; width: 100%; z-index: 300;
-  display: flex; align-items: center; justify-content: space-between;
+  position: fixed; top: 0; right: 0; z-index: 300;
   padding: 20px 24px;
-}
-.nav-logo {
-  font-family: 'Kumbh Sans', sans-serif; font-weight: 400; font-size: 14px;
-  color: #191919; text-transform: lowercase;
-  transition: color 0.3s ease;
 }
 .nav-menu-btn {
   font-family: 'Kumbh Sans', sans-serif; font-weight: 400; font-size: 14px;
   color: #191919; background: none; border: none; cursor: crosshair;
   transition: color 0.3s ease;
 }
-.nav.nav-inverted .nav-logo,
 .nav.nav-inverted .nav-menu-btn { color: #EFEDEA; }
 
 /* ─── MENU OVERLAY ───────────────────────────────────────── */
@@ -269,7 +262,6 @@ footer { background: #191919; padding: 60px 24px; border-top: 1px solid #2a2a2a;
 
 <!-- ─── NAV ─────────────────────────────────────────────── -->
 <nav class="nav" id="nav">
-  <a href="#hero" class="nav-logo">mahek jain</a>
   <button class="nav-menu-btn" id="menuBtn" aria-label="Open menu">Menu</button>
 </nav>
 
