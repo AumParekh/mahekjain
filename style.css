@@ -363,8 +363,23 @@ h1, h2, h3 { font-family: var(--display); font-weight: 700;
 @keyframes sweep { 0%{transform:translateX(-100%)} 60%,100%{transform:translateX(100%)} }
 
 @media (max-width: 820px) {
-  .hero { grid-template-columns: 1fr; }
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: var(--s7);
+    padding-bottom: var(--s4);
+    min-height: auto;
+  }
   .hero__frame { display: none; }
+  .hero__row { gap: var(--s3); }
+  .scrollcue { margin-top: var(--s4); }
+}
+
+@media (max-width: 480px) {
+  .hero { padding-top: calc(var(--nav-h) + var(--s4)); }
+  .hero__name { font-size: clamp(58px, 16vw, 70px); }
+  .hero__meta + .hero__meta { margin-top: 0; }
+  .pre__label { gap: 0.5rem; font-size: 0.8rem; }
+  .pre__num { font-size: clamp(3.5rem, 13vw, 4.5rem); }
 }
 
 /* ---- 13. SECTION HEAD ---------------------------------------- */
