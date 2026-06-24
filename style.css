@@ -143,7 +143,7 @@ img { max-width: 100%; display: block; }
 
 .word { display: inline-block; overflow: hidden; vertical-align: top; }
 .word > span { display: inline-block; transform: translateY(105%);
-  transition: transform 0.9s var(--ease-out); }
+  transition: transform 0.9s var(--ease); }
 .word.in > span { transform: translateY(0); }
 
 /* ---- 7. EYEBROW ---------------------------------------------- */
@@ -374,7 +374,15 @@ h1, h2, h3 { font-family: var(--display); font-weight: 700;
 /* ---- 14. STAT STRIP (flat, no cards) ------------------------- */
 .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 0;
   border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.stat { padding: var(--s4) var(--s3); border-right: 1px solid var(--line); }
+.stats.reveal { transition-duration: 0.25s; }
+.stat { padding: var(--s4) var(--s3); border-right: 1px solid var(--line);
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease); }
+.stats.in .stat { opacity: 1; transform: none; }
+.stats.in .stat:nth-child(1) { transition-delay: 0.06s; }
+.stats.in .stat:nth-child(2) { transition-delay: 0.14s; }
+.stats.in .stat:nth-child(3) { transition-delay: 0.22s; }
+.stats.in .stat:nth-child(4) { transition-delay: 0.30s; }
 .stats .stat:last-child { border-right: 0; }
 .stat__n { font-family: var(--display); font-size: clamp(2rem,5vw,3.2rem);
   font-weight: 700; line-height: 1; letter-spacing: -0.04em;
@@ -678,7 +686,10 @@ h1, h2, h3 { font-family: var(--display); font-weight: 700;
   }
   .reveal { opacity: 1; transform: none; }
   .word > span { transform: none; }
+  .pre { transform: none; }
+  .stat { opacity: 1; transform: none; }
   .marquee__track { animation: none; }
+  .scrollcue .ln::after { animation: none; }
 }
 
 /* ---- 27. FOCUS ----------------------------------------------- */

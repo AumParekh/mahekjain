@@ -76,17 +76,28 @@
     }
   }
 
+  /* --- heading clip-mask wrapping (at load, before IO) ------ */
+  if (!reduce) {
+    document.querySelectorAll("h2.h2, .page-hero__title, .cs-hero__title").forEach(function (el) {
+      el.innerHTML = '<span class="clip"><span class="pre">' + el.innerHTML + "</span></span>";
+    });
+  }
+
   /* --- scroll reveals --------------------------------------- */
   var items = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window && !reduce) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
-        if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+        if (en.isIntersecting) {
+          en.target.classList.add("in");
+          en.target.classList.add("show");
+          io.unobserve(en.target);
+        }
       });
     }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
     items.forEach(function (el) { io.observe(el); });
   } else {
-    items.forEach(function (el) { el.classList.add("in"); });
+    items.forEach(function (el) { el.classList.add("in"); el.classList.add("show"); });
   }
 
   /* --- word-by-word hero reveal ----------------------------- */
@@ -95,10 +106,11 @@
     if (reduce || !("IntersectionObserver" in window)) {
       words.forEach(function (w) { w.classList.add("in"); });
     } else {
+      var preDelay = sessionStorage.getItem("pre_done") ? 60 : 2200;
       words.forEach(function (w, i) {
         var inner = w.querySelector("span");
-        if (inner) inner.style.transitionDelay = (i * 0.07) + "s";
-        setTimeout(function () { w.classList.add("in"); }, 120);
+        if (inner) inner.style.transitionDelay = (i * 0.15) + "s";
+        setTimeout(function () { w.classList.add("in"); }, preDelay);
       });
     }
   }
