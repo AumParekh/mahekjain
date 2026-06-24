@@ -585,7 +585,33 @@ h1, h2, h3 { font-family: var(--display); font-weight: 700;
   font-size: clamp(1.5rem, 3.5vw, 2.4rem); letter-spacing: -0.03em; }
 .cs-next a:hover .cs-next__title { opacity: 0.6; }
 
-/* ---- 26. REDUCED MOTION -------------------------------------- */
+/* ---- 26. PRELOADER ------------------------------------------- */
+#preloader {
+  position: fixed; inset: 0; z-index: 9000;
+  background: var(--black); color: var(--bone);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.7s var(--ease);
+}
+#preloader.pre--done { opacity: 0; pointer-events: none; }
+.pre__inner { display: flex; flex-direction: column; align-items: center; gap: var(--s4); }
+.pre__label {
+  display: inline-flex; align-items: center; gap: 0.75rem;
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(0.9rem, 2vw, 1.4rem); letter-spacing: 0.12em;
+  color: rgba(239,237,234,0.4);
+}
+.pre__spin {
+  width: 18px; height: 1px; background: var(--bone);
+  animation: pre-spin 1.2s linear infinite;
+}
+@keyframes pre-spin { to { transform: rotate(360deg); } }
+.pre__num {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(4.5rem, 13vw, 10rem); line-height: 0.85;
+  letter-spacing: -0.06em; color: var(--bone);
+}
+
+/* ---- 27. REDUCED MOTION -------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

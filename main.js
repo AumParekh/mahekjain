@@ -4,6 +4,32 @@
   "use strict";
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* --- preloader -------------------------------------------- */
+  (function () {
+    var el = document.getElementById("preloader");
+    if (!el) return;
+    if (sessionStorage.getItem("pre_done")) { el.style.display = "none"; return; }
+    var pctEl = document.getElementById("pre-pct");
+    var start = null;
+    var dur   = 2400;
+    function tick(ts) {
+      if (!start) start = ts;
+      var p     = reduce ? 1 : Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      if (pctEl) pctEl.textContent = Math.round(eased * 100);
+      if (p < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        el.classList.add("pre--done");
+        setTimeout(function () {
+          el.style.display = "none";
+          sessionStorage.setItem("pre_done", "1");
+        }, 750);
+      }
+    }
+    requestAnimationFrame(tick);
+  })();
+
   /* --- Lenis smooth scroll ----------------------------------- */
   if (typeof Lenis !== "undefined" && !reduce) {
     var lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
