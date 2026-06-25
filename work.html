@@ -37,6 +37,12 @@
 
   .pcell .pbox{transition:transform .7s cubic-bezier(.2,.8,.2,1)}
   .pcell:hover .pbox{transform:scale(1.03)}
+
+  @media(max-width:640px){
+    html,body{overflow-x:hidden}
+    .t-display{font-size:clamp(36px,9.5vw,60px)!important}
+    footer>div:first-child{grid-template-columns:1fr 1fr!important}
+  }
 </style>
 </head>
 <body>

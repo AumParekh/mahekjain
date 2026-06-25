@@ -72,6 +72,19 @@
   .svc-flowwrap.has-open .svc-unit:not(.is-open){opacity:.35}
   .svc-unit.is-open .svc-and{display:none}
   .svc-detail{overflow:hidden;max-height:0;opacity:0;transition:max-height .6s cubic-bezier(.82,0,.18,1),opacity .5s cubic-bezier(.82,0,.18,1)}
+
+  @media(max-width:640px){
+    html,body{overflow-x:hidden}
+    /* scale down the big display type so words fit on screen */
+    .t-display{font-size:clamp(36px,9.5vw,60px)!important}
+    .t-menu{font-size:clamp(28px,8vw,52px)!important}
+    /* hide side-floating italic labels in menu overlay */
+    .mlabel{display:none!important}
+    /* gallery: 5 cols → 2 cols */
+    .gallery{grid-template-columns:repeat(2,1fr)!important}
+    /* footer: 4 cols → 2 cols */
+    footer>div:first-child{grid-template-columns:1fr 1fr!important}
+  }
 </style>
 </head>
 <body>
