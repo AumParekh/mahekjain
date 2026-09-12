@@ -44,9 +44,6 @@
   .arrow-r:hover .js-arrow{transform:translateX(8px)}
   .arrow-l:hover .js-arrow{transform:translateX(-8px)}
 
-  .gallery.has-hover .cell:not(.is-hovered) img{filter:grayscale(100%);opacity:.55}
-  .gallery.has-hover .cell.is-hovered img{transform:scale(1.03)}
-  .cell img{transition:filter .45s cubic-bezier(.4,0,.2,1),opacity .45s cubic-bezier(.4,0,.2,1),transform .6s cubic-bezier(.2,.8,.2,1)}
 
   .mword{position:relative;display:inline-block;overflow:hidden;vertical-align:top}
   .mword .a,.mword .b{display:block;transition:transform .7s cubic-bezier(.82,0,.18,1)}
@@ -80,8 +77,6 @@
     .t-menu{font-size:clamp(28px,8vw,52px)!important}
     /* hide side-floating italic labels in menu overlay */
     .mlabel{display:none!important}
-    /* gallery: 5 cols → 2 cols */
-    .gallery{grid-template-columns:repeat(2,1fr)!important}
     /* footer: 4 cols → 2 cols */
     footer>div:first-child{grid-template-columns:1fr 1fr!important}
   }
@@ -234,42 +229,6 @@
   </div>
 </section>
 
-<!-- ============ WORK GALLERY ============ -->
-<section id="work" class="reveal" style="background:#EFEDEA;padding:90px 0">
-  <div class="gallery" style="display:grid;grid-template-columns:repeat(5,1fr);width:100vw;gap:2px">
-    <div class="cell">
-      <div class="t-body" style="padding:8px 12px">( 01 )</div>
-      <div style="aspect-ratio:3/4;overflow:hidden">
-        <img class="imgfade" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="" style="height:100%;object-fit:cover">
-      </div>
-    </div>
-    <div class="cell">
-      <div class="t-body" style="padding:8px 12px">( 02 )</div>
-      <div style="aspect-ratio:3/4;overflow:hidden">
-        <img class="imgfade" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="" style="height:100%;object-fit:cover">
-      </div>
-    </div>
-    <div class="cell">
-      <div class="t-body" style="padding:8px 12px">( 03 )</div>
-      <div style="aspect-ratio:3/4;overflow:hidden">
-        <img class="imgfade" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="" style="height:100%;object-fit:cover">
-      </div>
-    </div>
-    <div class="cell">
-      <div class="t-body" style="padding:8px 12px">( 04 )</div>
-      <div style="aspect-ratio:3/4;overflow:hidden">
-        <img class="imgfade" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="" style="height:100%;object-fit:cover">
-      </div>
-    </div>
-    <div class="cell">
-      <div class="t-body" style="padding:8px 12px">( 05 )</div>
-      <div style="aspect-ratio:3/4;overflow:hidden">
-        <img class="imgfade" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="" style="height:100%;object-fit:cover">
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ============ CONTACT ============ -->
 <section id="contact" class="reveal" style="min-height:88svh;background:#191919;color:#EFEDEA;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:120px 8vw;text-align:center">
   <div style="max-width:1100px">
@@ -419,23 +378,6 @@
     });
   }
 
-  /* ── Gallery hover spotlight ─────────────────────────────── */
-  function wireGallery() {
-    const grid = document.querySelector('.gallery');
-    if (!grid) return;
-    const cells = [...grid.querySelectorAll('.cell')];
-    cells.forEach(cell => {
-      cell.addEventListener('mouseenter', () => {
-        grid.classList.add('has-hover');
-        cells.forEach(c => c.classList.toggle('is-hovered', c === cell));
-      });
-    });
-    grid.addEventListener('mouseleave', () => {
-      grid.classList.remove('has-hover');
-      cells.forEach(c => c.classList.remove('is-hovered'));
-    });
-  }
-
   /* ── Back to top ─────────────────────────────────────────── */
   function wireToTop() {
     const btn = document.getElementById('toTop');
@@ -473,7 +415,6 @@
   runPreloader();
   wireMenu();
   wireServices();
-  wireGallery();
   wireToTop();
   initLenis();
   initReveals();
