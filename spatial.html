@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Late Checkout, Mahek Jain</title>
+<meta name="description" content="Late Checkout, an event and spatial design project by Mahek Jain.">
+<meta name="theme-color" content="#EFEDEA">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-font-smoothing:antialiased}
+  body{background:#EFEDEA;color:#191919;font-family:'Kumbh Sans',sans-serif;font-size:16px;cursor:crosshair;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{background:#E3E1DE;display:block;width:100%}
+  ::selection{background:#191919;color:#EFEDEA}
+
+  .t-display  {font-family:'Kumbh Sans',sans-serif;font-weight:700;font-size:clamp(70px,13vw,168px);line-height:.82;letter-spacing:-.045em;text-transform:uppercase}
+  .t-serif-xl {font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(32px,4.6vw,72px);line-height:1.12;letter-spacing:-.015em}
+  .t-serif-lg {font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(20px,2.4vw,38px);line-height:1.3;letter-spacing:-.01em}
+  .t-aside    {font-family:'Playfair Display',serif;font-weight:400;font-style:italic;font-size:clamp(16px,1.5vw,24px);line-height:1.2}
+  .t-body     {font-family:'Kumbh Sans',sans-serif;font-weight:400;font-size:14px;line-height:1.4;letter-spacing:.01em}
+  .t-bodyb    {font-family:'Kumbh Sans',sans-serif;font-weight:700;font-size:15px;line-height:1.3}
+
+  .clip{display:block;overflow:hidden}
+  .reveal .pre{transform:translateY(112%);transition:transform 1.1s cubic-bezier(.82,0,.18,1)}
+  .reveal.show .pre{transform:translateY(0)}
+  .reveal .imgfade{opacity:.01;transition:opacity .8s cubic-bezier(.82,0,.18,1)}
+  .reveal.show .imgfade{opacity:1}
+
+  .ul-hover{position:relative;display:inline-block;padding-bottom:2px}
+  .ul-hover::after{content:'';position:absolute;left:0;bottom:0;width:0;height:1.5px;background:currentColor;transition:width .45s cubic-bezier(.98,0,.02,1)}
+  .ul-hover:hover::after{width:100%}
+
+  .exp-chip{border:1px solid currentColor;padding:6px 13px;font-size:12px;white-space:nowrap;opacity:.7;transition:opacity .35s}
+
+  .exp-role{font-family:'Kumbh Sans',sans-serif;font-weight:700;font-size:clamp(30px,5.4vw,80px);line-height:.95;letter-spacing:-.04em;text-transform:uppercase}
+  .exp-toggle{position:relative;cursor:pointer;padding:clamp(30px,5vh,62px) 8vw;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .exp-plus{position:absolute;right:8vw;top:50%;transform:translateY(-50%);font-weight:400;font-size:clamp(26px,3vw,44px);line-height:1;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+  .exp-item.is-open .exp-plus{transform:translateY(-50%) rotate(45deg)}
+  .exp-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .55s cubic-bezier(.82,0,.18,1),opacity .55s cubic-bezier(.82,0,.18,1)}
+  .exp-item.is-open .exp-panel{max-height:2400px;opacity:1}
+  .exp-list.has-open .exp-item:not(.is-open){opacity:.35}
+  .exp-item{transition:opacity .3s cubic-bezier(.4,0,.2,1)}
+
+  @media(max-width:640px){
+    html,body{overflow-x:hidden}
+    .t-display{font-size:clamp(36px,9.5vw,60px)!important}
+    /* shrink long role names so they don't overflow */
+    .exp-role{font-size:clamp(20px,5.5vw,80px)!important}
+    /* tighten horizontal padding so + button doesn't intrude on title */
+    .exp-toggle{padding-left:16px;padding-right:48px}
+    .exp-plus{right:14px;font-size:clamp(20px,5vw,44px)}
+    footer>div:first-child{grid-template-columns:1fr 1fr!important}
+  }
+
+  .sp-wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,3vw,32px)}
+  .sp-page{margin:0 0 clamp(14px,2.4vw,30px)}
+  .sp-page img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#E3E1DE}
+  .sp-dl{display:inline-block;border:1px solid currentColor;padding:12px 22px;transition:background .35s,color .35s}
+  .sp-dl:hover{background:#191919;color:#EFEDEA}
+  @media(max-width:640px){
+    html,body{overflow-x:hidden}
+    .t-display{font-size:clamp(40px,11vw,70px)!important}
+    footer>div:first-child{grid-template-columns:1fr 1fr!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header style="position:fixed;top:0;left:0;width:100%;z-index:300;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;mix-blend-mode:difference">
+  <a href="index.html#top" class="t-body" style="color:#EFEDEA;font-size:15px">mahek jain</a>
+  <a href="index.html#top" class="t-body" style="color:#EFEDEA;font-size:15px">Index</a>
+</header>
+
+<!-- HERO -->
+<section class="reveal show" style="min-height:72svh;background:#EFEDEA;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:130px 18px 40px;text-align:center">
+  <div class="clip" style="margin-bottom:clamp(18px,3vh,34px)"><div class="t-aside pre" style="font-style:normal;opacity:.55;font-size:clamp(15px,1.3vw,19px)">( Event &amp; Spatial Design )</div></div>
+  <div class="clip"><div class="t-display pre" style="transition-delay:120ms">Late Checkout</div></div>
+  <div class="clip" style="margin-top:clamp(20px,3vh,36px)"><div class="t-serif-lg pre" style="transition-delay:260ms;max-width:680px;opacity:.85">A Sangeet built as a hotel, where you check in with a drink instead of a key.</div></div>
+</section>
+
+<!-- PAGES -->
+<section class="sp-wrap" style="padding-bottom:clamp(40px,8vh,90px)">
+  <figure class="sp-page"><img src="assets/spatial/01.jpg" alt="Late Checkout, page 1 of 38" width="1920" height="1080" fetchpriority="high"></figure>
+  <figure class="sp-page"><img src="assets/spatial/02.jpg" alt="Late Checkout, page 2 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/03.jpg" alt="Late Checkout, page 3 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/04.jpg" alt="Late Checkout, page 4 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/05.jpg" alt="Late Checkout, page 5 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/06.jpg" alt="Late Checkout, page 6 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/07.jpg" alt="Late Checkout, page 7 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/08.jpg" alt="Late Checkout, page 8 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/09.jpg" alt="Late Checkout, page 9 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/10.jpg" alt="Late Checkout, page 10 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/11.jpg" alt="Late Checkout, page 11 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/12.jpg" alt="Late Checkout, page 12 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/13.jpg" alt="Late Checkout, page 13 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/14.jpg" alt="Late Checkout, page 14 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/15.jpg" alt="Late Checkout, page 15 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/16.jpg" alt="Late Checkout, page 16 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/17.jpg" alt="Late Checkout, page 17 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/18.jpg" alt="Late Checkout, page 18 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/19.jpg" alt="Late Checkout, page 19 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/20.jpg" alt="Late Checkout, page 20 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/21.jpg" alt="Late Checkout, page 21 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/22.jpg" alt="Late Checkout, page 22 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/23.jpg" alt="Late Checkout, page 23 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/24.jpg" alt="Late Checkout, page 24 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/25.jpg" alt="Late Checkout, page 25 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/26.jpg" alt="Late Checkout, page 26 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/27.jpg" alt="Late Checkout, page 27 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/28.jpg" alt="Late Checkout, page 28 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/29.jpg" alt="Late Checkout, page 29 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/30.jpg" alt="Late Checkout, page 30 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/31.jpg" alt="Late Checkout, page 31 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/32.jpg" alt="Late Checkout, page 32 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/33.jpg" alt="Late Checkout, page 33 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/34.jpg" alt="Late Checkout, page 34 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/35.jpg" alt="Late Checkout, page 35 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/36.jpg" alt="Late Checkout, page 36 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/37.jpg" alt="Late Checkout, page 37 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/spatial/38.jpg" alt="Late Checkout, page 38 of 38" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+</section>
+
+<!-- FULL RESOLUTION -->
+<section style="background:#EFEDEA;padding:0 24px clamp(60px,10vh,120px);text-align:center">
+  <div class="t-serif-lg" style="max-width:560px;margin:0 auto clamp(24px,4vh,36px)">Want it at full resolution, print quality?</div>
+  <!-- TODO: once mahek-jain-spatial-portfolio.pdf is added at the repo root, restore:
+     <a href="/mahek-jain-spatial-portfolio.pdf" target="_blank" rel="noopener" class="t-bodyb sp-dl">Open the full PDF</a> -->
+  <span class="t-bodyb sp-dl" style="opacity:.5">Full PDF coming shortly</span>
+</section>
+
+<!-- CTA -->
+<section class="reveal" style="min-height:80svh;background:#191919;color:#EFEDEA;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:120px 8vw;text-align:center;margin-top:60px">
+  <div style="max-width:1100px">
+    <div class="clip"><div class="t-serif-xl pre" style="line-height:1.12">I don't just design things. I design how they feel, how they hold together, and how they guide the person moving through them. Let's build something worth remembering.</div></div>
+  </div>
+  <a href="mailto:mahekjain324@gmail.com" class="t-bodyb pre" style="display:inline-block;margin-top:clamp(36px,6vh,60px);text-decoration:underline;text-underline-offset:6px;transition:transform 1.1s cubic-bezier(.82,0,.18,1);transition-delay:200ms">Don't be shy, get in touch</a>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#191919;color:#EFEDEA;padding:90px 24px 40px">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px;align-items:start">
+    <div class="t-body" style="opacity:.5">( Menu )</div>
+    <div style="display:flex;flex-direction:column;gap:12px" class="t-bodyb">
+      <a href="index.html#top" class="ul-hover">Index</a>
+      <a href="services.html" class="ul-hover">Projects</a>
+      <a href="experience.html" class="ul-hover">Experience</a>
+      <a href="index.html#contact" class="ul-hover">Contact</a>
+    </div>
+    <div class="t-body" style="opacity:.5">( Reach out )</div>
+    <div style="display:flex;flex-direction:column;gap:12px" class="t-bodyb">
+      <a href="mailto:mahekjain324@gmail.com" class="ul-hover">Email</a>
+      <a href="https://www.linkedin.com/in/mahek-jain-547782246" target="_blank" class="ul-hover">LinkedIn</a>
+      <!-- TODO: once the PDF is added, wrap as <a href="/mahek-jain-resume.pdf" download="Mahek-Jain-Resume.pdf" class="ul-hover"> -->
+      <span>Résumé (PDF)</span>
+      <span>+91 78019 56285</span>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:80px" class="t-body">
+    <span style="opacity:.4">&copy; 2026 Mahek Jain</span>
+    <span style="opacity:.4">Creative Designer</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal:not(.show)').forEach(el => io.observe(el));
+
+  const list = document.querySelector('.exp-list');
+  if (list) {
+    const items = [...list.querySelectorAll('.exp-item')];
+    const closeAll = () => items.forEach(i => {
+      i.classList.remove('is-open');
+      const p = i.querySelector('.exp-panel'); if (p) { p.style.maxHeight = '0px'; p.style.opacity = '0'; }
+      const pl = i.querySelector('.exp-plus'); if (pl) pl.style.transform = 'translateY(-50%) rotate(0deg)';
+      i.style.opacity = '';
+    });
+    items.forEach(item => {
+      const toggle = item.querySelector('[data-toggle]');
+      const panel = item.querySelector('.exp-panel');
+      const plus = item.querySelector('.exp-plus');
+      toggle.addEventListener('click', () => {
+        const willOpen = !item.classList.contains('is-open');
+        closeAll();
+        if (willOpen) {
+          item.classList.add('is-open');
+          panel.style.maxHeight = panel.scrollHeight + 'px';
+          panel.style.opacity = '1';
+          if (plus) plus.style.transform = 'translateY(-50%) rotate(45deg)';
+          items.forEach(i => { if (i !== item) i.style.opacity = '0.35'; });
+        }
+      });
+    });
+  }
+
+  const tryInit = (n) => {
+    if (window.Lenis) {
+      try {
+        const lenis = new window.Lenis({ duration: 1.15 });
+        const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
+        requestAnimationFrame(raf);
+      } catch (e) {}
+    } else if (n > 0) {
+      setTimeout(() => tryInit(n - 1), 200);
+    }
+  };
+  tryInit(10);
+})();
+</script>
+</body>
+</html>
