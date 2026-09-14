@@ -69,15 +69,14 @@
     footer>div:first-child{grid-template-columns:1fr 1fr!important}
   }
 
-  .pv-wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,3vw,32px)}
-  .pv-page{margin:0 0 clamp(14px,2.4vw,30px)}
-  .pv-tile{width:100%;background:#E3E1DE;display:block}
-  .pv-tile canvas{width:100%;height:100%;display:block}
-  .pv-dl{display:inline-block;border:1px solid currentColor;padding:12px 22px;transition:background .35s,color .35s}
-  .pv-dl:hover{background:#191919;color:#EFEDEA}
+  .sp-wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,3vw,32px)}
+  .sp-page{margin:0 0 clamp(14px,2.4vw,30px)}
+  .sp-page img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#E3E1DE}
+  .sp-dl{display:inline-block;border:1px solid currentColor;padding:12px 22px;transition:background .35s,color .35s}
+  .sp-dl:hover{background:#191919;color:#EFEDEA}
   @media(max-width:640px){
     html,body{overflow-x:hidden}
-    .t-display{font-size:clamp(36px,9.5vw,60px)!important}
+    .t-display{font-size:clamp(40px,11vw,70px)!important}
     footer>div:first-child{grid-template-columns:1fr 1fr!important}
   }
 </style>
@@ -91,25 +90,32 @@
 </header>
 
 <!-- HERO -->
-<section class="reveal show" style="min-height:60svh;background:#EFEDEA;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:130px 18px 40px;text-align:center">
-  <div class="clip" style="margin-bottom:clamp(18px,3vh,34px)"><div class="t-aside pre" style="font-style:normal;opacity:.55;font-size:clamp(15px,1.3vw,19px)">( Portfolio )</div></div>
-  <div class="clip"><div class="t-display pre" style="transition-delay:120ms;font-size:clamp(40px,7.4vw,104px)">UGC Design</div></div>
+<section class="reveal show" style="min-height:72svh;background:#EFEDEA;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:130px 18px 40px;text-align:center">
+  <div class="clip" style="margin-bottom:clamp(18px,3vh,34px)"><div class="t-aside pre" style="font-style:normal;opacity:.55;font-size:clamp(15px,1.3vw,19px)">( UGC Design )</div></div>
+  <div class="clip"><div class="t-display pre" style="transition-delay:120ms">UGC Design</div></div>
   <div class="clip" style="margin-top:clamp(20px,3vh,36px)"><div class="t-serif-lg pre" style="transition-delay:260ms;max-width:680px;opacity:.85">Content built to look like a person made it, not a brand, made for feeds where polish reads as advertising.</div></div>
 </section>
 
-<!-- VIEWER: rendered by assets/pdfview.js; the link below works without it -->
-<section class="pv-wrap" style="padding-bottom:clamp(30px,5vh,60px)">
-  <div data-pdf="/mahek-jain-ugc-portfolio.pdf"></div>
-  <p id="pv-status" class="t-body" hidden style="text-align:center;opacity:.6;padding:24px 0"></p>
-  <noscript><p class="t-body" style="text-align:center;opacity:.6;padding:24px 0">Open the PDF below to view this portfolio.</p></noscript>
+<!-- PAGES -->
+<section class="sp-wrap" style="padding-bottom:clamp(40px,8vh,90px)">
+  <figure class="sp-page"><img src="assets/ugc/01.png" alt="UGC Design, page 1 of 12" width="1920" height="1080" fetchpriority="high"></figure>
+  <figure class="sp-page"><img src="assets/ugc/02.png" alt="UGC Design, page 2 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/03.png" alt="UGC Design, page 3 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/04.png" alt="UGC Design, page 4 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/05.png" alt="UGC Design, page 5 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/06.png" alt="UGC Design, page 6 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/07.png" alt="UGC Design, page 7 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/08.png" alt="UGC Design, page 8 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/09.png" alt="UGC Design, page 9 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/10.png" alt="UGC Design, page 10 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/11.png" alt="UGC Design, page 11 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+  <figure class="sp-page"><img src="assets/ugc/12.png" alt="UGC Design, page 12 of 12" width="1920" height="1080" loading="lazy" decoding="async"></figure>
 </section>
 
-<!-- FULL PDF -->
+<!-- FULL RESOLUTION -->
 <section style="background:#EFEDEA;padding:0 24px clamp(60px,10vh,120px);text-align:center">
-  <a href="/mahek-jain-ugc-portfolio.pdf" download="Mahek-Jain-UGC-Portfolio.pdf" class="t-bodyb pv-dl">Download PDF</a>
+  <a href="/mahek-jain-ugc-portfolio.pdf" download="Mahek-Jain-UGC-Portfolio.pdf" class="t-bodyb sp-dl">Download PDF</a>
 </section>
-
-<script src="assets/pdfview.js" defer></script>
 
 <!-- CTA -->
 <section class="reveal" style="min-height:80svh;background:#191919;color:#EFEDEA;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:120px 8vw;text-align:center;margin-top:60px">
