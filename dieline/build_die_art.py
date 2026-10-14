@@ -1,11 +1,9 @@
 """Whole-die artwork with 3 mm bleed: milda_die_art_bleed_600dpi.jpg
  - pink pattern background under the entire die (flaps, side panels, glue flaps) + 3 mm bleed all round
  - the front artwork continues 3 mm past its outer cut edge (mirrored), so a print shift can't leave a white sliver
- - a small waffle piece and sparkle (lifted from the front artwork) decorate the front top flap
 """
 import numpy as np, os
 from PIL import Image, ImageFilter
-from scipy.ndimage import label, find_objects, binary_closing, binary_fill_holes, binary_dilation, gaussian_filter
 from artlib import pattern_detail
 Image.MAX_IMAGE_PIXELS = None
 here = os.path.dirname(os.path.abspath(__file__)); P = lambda n: os.path.join(here, n)
@@ -43,32 +41,6 @@ def place(img, x_cm, ext_left=0):
     x0, y0 = cx(x_cm) - ext_left, cy(15)
     canvas[y0:y0 + e.shape[0], x0:x0 + e.shape[1]] = e
 place(front, 0, ext_left=ext); place(back, 8)
-
-# ---- 3. flap decoration: waffle piece + sparkle lifted from the front artwork ------
-def cutout(mask, margin=8):
-    mask = binary_fill_holes(binary_closing(mask, iterations=3))
-    ys, xs = np.where(mask); y0, y1, x0, x1 = ys.min() - margin, ys.max() + margin, xs.min() - margin, xs.max() + margin
-    a = gaussian_filter(binary_dilation(mask, iterations=1).astype(float), 1.4)[y0:y1, x0:x1]
-    return front[y0:y1, x0:x1], a
-r, g, b = (front[..., i].astype(int) for i in range(3))
-org = (r > 200) & (g > 110) & (g < 215) & (b < 150) & (r - b > 80)
-lab, _ = label(binary_closing(org, iterations=3)); waffle_mask = lab == lab[2300, 1500] if lab[2300, 1500] else None
-cream = (g > 215) & (b > 190) & (r > 240) & (r - b < 60)
-lab2, _ = label(binary_closing(cream, iterations=2)); star_mask = lab2 == lab2[1550, 160]
-assert waffle_mask is not None and lab2[1550, 160] > 0
-def paste(rgb, a, cxcm, cycm, size_cm, by='w', rot=0):
-    im = Image.fromarray(np.dstack([rgb, (a * 255).astype(np.uint8)]), 'RGBA')
-    s = size_cm * PX / (im.width if by == 'w' else im.height)
-    im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
-    if rot: im = im.rotate(rot, expand=True, resample=Image.BICUBIC)
-    arr = np.asarray(im).astype(float); al = arr[..., 3:] / 255
-    x0, y0 = cx(cxcm) - im.width // 2, cy(cycm) - im.height // 2
-    reg = canvas[y0:y0 + im.height, x0:x0 + im.width].astype(float)
-    canvas[y0:y0 + im.height, x0:x0 + im.width] = (reg * (1 - al) + arr[..., :3] * al).round().astype(np.uint8)
-w_rgb, w_a = cutout(waffle_mask); s_rgb, s_a = cutout(star_mask)
-# both sit inside the straight part of the front top flap (x 1.5-5.5 cm, y 15-16.5 cm), >= 3 mm from every edge
-paste(w_rgb, w_a, 2.5, 15.75, 1.0, by='w', rot=18)
-paste(s_rgb, s_a, 4.3, 15.75, 0.95, by='h')
 
 Image.fromarray(canvas).save(P('milda_die_art_bleed_600dpi.jpg'), quality=95, subsampling=0, dpi=(600, 600))
 print('die art', canvas.shape)
