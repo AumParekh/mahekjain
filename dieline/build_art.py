@@ -8,7 +8,7 @@
 """
 from PIL import Image, ImageFilter, ImageDraw, ImageFont
 import numpy as np, os
-from scipy.ndimage import gaussian_filter, gaussian_filter1d, binary_dilation
+from scipy.ndimage import gaussian_filter, gaussian_filter1d, binary_dilation, binary_closing, binary_fill_holes
 from artlib import pattern_detail, tile
 here = os.path.dirname(os.path.abspath(__file__))
 P = lambda *n: os.path.join(here, *n)
@@ -197,10 +197,39 @@ INK_TAG = dark_colour(F3, 226, 247, 28, 512, 110)      # tagline brown
 INK_BAR = dark_colour(F3, 1040, 1074, 85, 470, 90)     # WAFFLEBAR brown
 put_text(F3, 'SINGLE-ORIGIN KARAVALI COCOA', 270, 276, 19, 700, INK_TAG, track=1.8, center=True)
 put_text(F3, '40 g', 275, 1124, 24, 700, INK_BAR, track=0.5, center=True)
+
+def redraw_box(up, margin=76, radius=106, ring=48):
+    """Redraw the back's cream panel at 600 dpi as ONE rounded rectangle (same corner radius on all four corners).
+    Inset `margin` px (76 px = 3.2 mm) from every edge, radius 106 px = 4.5 mm. Everything within `ring` px of the
+    edge is repainted (cream inside, pink + pattern outside); waffle pieces are kept on top."""
+    a = up.astype(float); h, w, _ = a.shape
+    yy, xx = np.mgrid[0:h, 0:w].astype(float); xx += 0.5; yy += 0.5
+    cxm, cym = w / 2, h / 2; hx, hy = w / 2 - margin, h / 2 - margin       # half sizes of the box
+    qx, qy = np.abs(xx - cxm) - (hx - radius), np.abs(yy - cym) - (hy - radius)
+    d = np.hypot(np.maximum(qx, 0), np.maximum(qy, 0)) + np.minimum(np.maximum(qx, qy), 0) - radius   # signed distance
+    inside = np.clip(0.5 - d, 0, 1)                                          # 1 px anti-aliased edge
+    pink_native = np.clip(TP + tile(DETAIL, *B3.shape[:2]), 0, 255).round().astype(np.uint8)
+    pink600 = Image.fromarray(pink_native).resize((w, h), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=2.2, percent=70, threshold=2))
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    # waffle = orange / brown-orange pieces (incl. their dark cells); never pink, cream or the dark-brown type
+    waffle = binary_fill_holes(binary_closing((r > 140) & (r - g > 45) & (r - b > 70), iterations=6))
+    # local cream colour sampled just inside the ring, so the repainted band matches the cream next to it
+    src = ((d < -ring - 6) & (d > -ring - 70) & (a.min(-1) > 215) & ~waffle).astype(float)
+    den = gaussian_filter(src, 40)[..., None]
+    cream_local = np.stack([gaussian_filter(a[..., i] * src, 40) for i in range(3)], -1) / np.maximum(den, 1e-6)
+    cream_local = np.where(den > 1e-4, cream_local, TC)
+    new = np.asarray(pink600).astype(float) * (1 - inside[..., None]) + cream_local * inside[..., None]
+    keep = gaussian_filter(binary_dilation(waffle, iterations=4).astype(float), 2)[..., None]
+    zone = (np.abs(d) <= ring)[..., None].astype(float)
+    zone = gaussian_filter(zone[..., 0], 1.0)[..., None]
+    out = a * (1 - zone * (1 - keep)) + new * zone * (1 - keep)
+    return out.clip(0, 255).round().astype(np.uint8)
+
 for name, arr in (('front', F3), ('back', B3)):
     im = Image.fromarray(arr if arr.dtype == np.uint8 else arr.round().astype(np.uint8))
     im.save(P(f'milda_{name}_art.png'))
     w, h = im.size
     up = im.resize((1654, 3543), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=2.2, percent=70, threshold=2))
+    if name == 'back': up = Image.fromarray(redraw_box(np.asarray(up)))
     up.save(P(f'milda_{name}_art_600dpi.png'), dpi=(600, 600))
     print(name, im.size, 'aspect', round(h / w, 4), 'target', round(15 / 7, 4))
