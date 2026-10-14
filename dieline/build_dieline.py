@@ -8,7 +8,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 P = lambda n: os.path.join(here, n)
 
 # Flap colour = pink sampled from the front artwork
-a = np.asarray(Image.open(P('milda_front_art.png')).convert('RGB'))[2:22, 2:22].reshape(-1, 3).mean(0)
+a = np.asarray(Image.open(P('milda_front_art_600dpi.png')).convert('RGB'))[2:22, 2:22].reshape(-1, 3).mean(0)
 PINK = Color(*(a / 255))
 BROWN = HexColor('#4a1d12')
 CUT = HexColor('#e6007e')      # solid = cut
@@ -51,8 +51,8 @@ c.rect(xs1, Y0, SF, PH, stroke=0, fill=1)
 c.rect(xs2, Y0, 2 * SF, PH, stroke=0, fill=1)
 
 # --- artwork (exact panels from the reference design) ----------------------
-c.drawImage(P('milda_front_art.png'), xf, Y0, PW, PH)
-c.drawImage(P('milda_back_art.png'), xb, Y0, PW, PH)
+c.drawImage(P('milda_front_art_600dpi.png'), xf, Y0, PW, PH)
+c.drawImage(P('milda_back_art_600dpi.png'), xb, Y0, PW, PH)
 
 # --- crease lines (dashed) -------------------------------------------------
 c.setStrokeColor(CREASE); c.setLineWidth(0.6); c.setDash(4, 3)
