@@ -88,7 +88,7 @@ for x0_ in (xs1, xs2, xg):
     tick_h(x0_, x0_ + SF, Y0 - 0.55 * cm, '1 cm', size=9)
 
 # --- title block / legend --------------------------------------------------
-c.setFont('Times-Bold', 13); c.drawString(X0, 1.7 * cm, 'MiLda - Milk Chocolate Wafflebar  |  Packaging Dieline')
+c.setFont('Times-Bold', 13); c.drawString(X0, 1.7 * cm, 'Milda - Milk Chocolate Wafflebar  |  Packaging Dieline')
 c.setFont('Times-Roman', 9)
 c.drawString(X0, 1.2 * cm, 'Scale 1:1  |  Panels 7 x 15 cm  |  End flaps 1.5 cm (R 1.5 cm)  |  Side flap 1 cm  |  Glue flaps 1 cm + 1 cm  |  Overall 17 x 18 cm')
 c.setStrokeColor(CUT); c.setLineWidth(0.8); c.line(X0, 0.65 * cm, X0 + 1 * cm, 0.65 * cm)
