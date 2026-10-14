@@ -1,12 +1,15 @@
-"""Reference mockup -> flat, evenly coloured 600 dpi panel artwork (7 x 15 cm).
+"""Reference mockup -> flat, evenly coloured 600 dpi panel artwork (7 x 15 cm), with 3 mm safe margins.
 1. crop each panel inside the mockup's 3D bevel/shadow
-2. add the extra height by mirroring blank background rows (no stretching)
+2. front: add height by mirroring blank pattern rows; back: re-space the blocks (blank cream rows only),
+   then inset the cream box so >= 3 mm of pink stays clear on every side
 3. level the lighting gradient so the pink (and cream) background is one even colour
-4. upscale to 600 dpi
+4. front: shrink + re-centre the logo and tagline inside the 3 mm safe area
+5. upscale to 600 dpi
 """
 from PIL import Image, ImageFilter, ImageDraw, ImageFont
 import numpy as np, os
-from scipy.ndimage import gaussian_filter
+from scipy.ndimage import gaussian_filter, gaussian_filter1d, binary_dilation
+from artlib import pattern_detail, tile
 here = os.path.dirname(os.path.abspath(__file__))
 P = lambda *n: os.path.join(here, *n)
 ref = Image.open(P('source', 'milda_reference.jpg')).convert('RGB')
@@ -98,9 +101,37 @@ fill_bg(B, 396, 520, 976, 996, 1005, 1013)
 put_text(B, 'DD/MM/YYYY', 399, 989, 15, 560, BROWN_B, track=0.3)
 
 # front: 30 + 2*12 + 2*20 = 94 extra rows (top margin, space under the tagline, space under WAFFLEBAR)
-F2 = grow(F, [('top', 30), ('mid', 217, 252, 12), ('mid', 1023, 1042, 20)])
-B2 = grow(B, [('mid', 179, 194, 14), ('mid', 285, 305, 18), ('mid', 871, 879, 9), ('mid', 941, 949, 8)])
-print(F2.shape, B2.shape)
+F2 = grow(F, [('top', 30), ('mid', 217, 248, 12), ('mid', 1023, 1042, 20)])
+
+RNG = np.random.default_rng(7)
+
+def insert_gaps(a, gaps):
+    """Re-space blocks. Each (seed0, seed1, extra): insert `extra` rows in the middle of the blank gap whose cleanest
+    rows are seed0..seed1. Inserted rows are smooth cream built from those clean rows, so the faint
+    letter tips that sit right next to the text are never repeated and no specks appear."""
+    pieces, prev = [], 0
+    for s0, s1, extra in sorted(gaps):
+        base = np.median(a[s0:s1 + 1].astype(float), axis=0)               # one clean row (cream + border strips)
+        base[26:-26] = gaussian_filter1d(base[26:-26], 5, axis=0)            # drop column ringing inside the box
+        rows = base[None] + RNG.normal(0, 1.0, (extra,) + base.shape)        # fresh fine grain, no repeated streaks
+        p = (s0 + s1) // 2 + 1
+        pieces.append(a[prev:p]); pieces.append(rows.clip(0, 255).round().astype(np.uint8)); prev = p
+    pieces.append(a[prev:])
+    return np.concatenate(pieces, 0)
+
+# Gaps between the blocks of the back (raw rows; seed rows verified clean to noise level, deviation < ~5 levels).
+# Paragraph gap (2nd entry) gets the smallest increase so it is never larger than the other gaps.
+GAPS = [(183, 187, 26),     # emblem  -> paragraph 1
+        (286, 299, 8),      # paragraph 1 -> paragraph 2
+        (404, 411, 28),     # paragraph 2 -> ingredients box
+        (873, 875, 32),     # storage box -> barcode
+        (947, 948, 25),     # barcode -> footer row
+        (1031, 1041, 20)]   # footer row -> bottom of the cream box
+PADX, PADY = 11, 3          # mirrored edge strip so the whole cream box can be inset by >= 3 mm
+B_tall = insert_gaps(B, GAPS)
+B_pad = np.pad(B_tall, ((PADY, PADY), (PADX, PADX), (0, 0)), mode='symmetric')
+B2 = np.asarray(Image.fromarray(B_pad).resize((543, 1163), Image.LANCZOS))
+print(F2.shape, B2.shape, 'back before inset', B_tall.shape)
 
 def level(a, cls, target, sigma):
     """Shift pixels of one colour class so its local average equals `target`."""
@@ -127,6 +158,40 @@ B3 = level(level(B2, pink, TP, 22), pink, TP, 6)   # 2nd tight pass for the narr
 B3 = level(B3, pink_loose, TP, 1.5)            # flatten the lighting gradient inside the thin border strips
 B3 = level(B3, cream, TC, 60)
 F3 = F3.round().astype(np.uint8)
+DETAIL = pattern_detail(F3)                              # fine pink pattern, taken from the blank front margin
+# the leveling flattened the thin back border strips: give them the same pattern as the front
+m = gaussian_filter(pink_loose(B3).astype(float), 0.8)[..., None]
+B3 = np.clip(B3 + tile(DETAIL, *B3.shape[:2]) * m, 0, 255)
+
+def rescale_ink(arr, y0, y1, scale, cx, ink):
+    """Shrink dark ink on the pink pattern about its centre, re-centre it on x=cx; the old ink is erased
+    with the surrounding pink (+ pattern) and the ink is redrawn from its own pixels (no re-typesetting)."""
+    reg = arr[y0:y1].astype(float); h, w, _ = reg.shape
+    bg = TP; ink = np.array(ink, float); d = bg - ink
+    a = np.clip(((bg - reg) @ d) / (d @ d), 0, 1); a[a < 0.05] = 0
+    cols = np.where((a > 0.5).any(0))[0]; cx0 = (cols.min() + cols.max()) / 2
+    mask = binary_dilation(a > 0.02, iterations=3)
+    keep = (~mask).astype(float)
+    num = np.stack([gaussian_filter(reg[..., i] * keep, 7) for i in range(3)], -1)
+    flat = num / np.maximum(gaussian_filter(keep, 7)[..., None], 1e-4)
+    det = tile(DETAIL, h, w)
+    bgc = np.where(mask[..., None], flat + det, reg)
+    pm = (reg - bg * (1 - a[..., None])).clip(0, 255)           # premultiplied ink
+    nw, nh = round(w * scale), round(h * scale)
+    pm2 = np.stack([np.asarray(Image.fromarray(pm[..., i].astype(np.float32), 'F').resize((nw, nh), Image.LANCZOS)) for i in range(3)], -1)
+    a2 = np.asarray(Image.fromarray(a.astype(np.float32), 'F').resize((nw, nh), Image.LANCZOS)).clip(0, 1)
+    ox = int(round(cx - cx0 * scale)); oy = (h - nh) // 2
+    out = bgc.copy()
+    win = out[oy:oy + nh, max(ox, 0):ox + nw]
+    sx = max(-ox, 0)
+    pm2c = pm2[:, sx:sx + win.shape[1]]; a2c = a2[:, sx:sx + win.shape[1]]
+    out[oy:oy + nh, max(ox, 0):ox + nw] = win * (1 - a2c[..., None]) + pm2c
+    arr[y0:y1] = out.clip(0, 255).round().astype(np.uint8)
+
+CX = (F3.shape[1] - 1) / 2
+INK_LOGO = dark_colour(F3, 85, 210, 26, 522, 90)
+rescale_ink(F3, 78, 218, 0.965, CX, INK_LOGO)           # MILDA wordmark: 497 -> 480 px, margins 17/26 -> ~29/29
+rescale_ink(F3, 220, 252, 0.945, CX, dark_colour(F3, 226, 247, 28, 530, 110))   # tagline: 507 -> 479 px
 # ---- front additions ------------------------------------------------------------
 INK_TAG = dark_colour(F3, 226, 247, 28, 512, 110)      # tagline brown
 INK_BAR = dark_colour(F3, 1040, 1074, 85, 470, 90)     # WAFFLEBAR brown
