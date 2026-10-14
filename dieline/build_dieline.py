@@ -7,9 +7,8 @@ import numpy as np, os
 here = os.path.dirname(os.path.abspath(__file__))
 P = lambda n: os.path.join(here, n)
 
-# Flap colour = pink sampled from the front artwork
-a = np.asarray(Image.open(P('milda_front_art_600dpi.png')).convert('RGB'))[2:22, 2:22].reshape(-1, 3).mean(0)
-PINK = Color(*(a / 255))
+# Flap colour = the levelled pink of the artwork background (see build_art.py)
+PINK = Color(252 / 255, 167 / 255, 206 / 255)
 BROWN = HexColor('#4a1d12')
 CUT = HexColor('#e6007e')      # solid = cut
 CREASE = HexColor('#00a3e0')   # dashed = crease/fold
