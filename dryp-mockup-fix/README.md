@@ -22,3 +22,11 @@ How: each correct line is cut from the artwork, warped onto the bag (SIFT
 homography → snap to the old print's position → ECC refinement), and composited
 over the bag with the old letters removed, using the photo's own ink colour and
 shading. Pixels off the bag (fingers, shirt) are left untouched.
+
+## Upscale / sharpen
+
+`upscale.py` runs Real-ESRGAN x4plus on CPU (download the 64 MB weights from
+https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth
+next to the script), blends a little Lanczos detail back in for fabric texture,
+and applies a gentle unsharp mask. Writes `output/dryp_mockup_fixed_4x.png`
+(4480×6000) and a 2× version downsampled from it.
