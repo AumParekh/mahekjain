@@ -8,6 +8,10 @@ Weights (64 MB, not committed):
 
 Writes output/dryp_mockup_fixed_4x.png (4480x6000) and
 output/dryp_mockup_fixed_2x.png (downsampled from the 4x result).
+
+The AI upscaler invents letters in small text, so after upscaling every small
+text line on both bags is re-placed at 4x straight from the flat artwork
+(same alignment as fix_mockup.py), keeping spelling exact and edges crisp.
 """
 import argparse
 import os
@@ -16,6 +20,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+import fix_mockup
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -96,23 +102,34 @@ def main():
     ap.add_argument("--in", dest="inp", default=os.path.join(HERE, "output", "dryp_mockup_fixed.png"))
     ap.add_argument("--texture", type=float, default=0.25,
                     help="share of plain Lanczos detail mixed back in so fabric keeps its weave")
+    ap.add_argument("--base", help="already-upscaled 4x image to start from instead of running the model")
+    ap.add_argument("--save-base", help="also save the raw upscaled image (before text) here")
     args = ap.parse_args()
 
-    torch.set_num_threads(os.cpu_count() or 4)
-    model = RRDBNet()
-    state = torch.load(args.weights, map_location="cpu")
-    model.load_state_dict(state.get("params_ema", state))
-    model.eval()
-
     src = cv2.imread(args.inp)
-    sr = upscale_x4(model, src).astype(np.float32)
+    if args.base:  # reuse an earlier upscale (skips the slow model pass)
+        out = cv2.imread(args.base)
+    else:
+        torch.set_num_threads(os.cpu_count() or 4)
+        model = RRDBNet()
+        state = torch.load(args.weights, map_location="cpu")
+        model.load_state_dict(state.get("params_ema", state))
+        model.eval()
+        sr = upscale_x4(model, src).astype(np.float32)
 
-    # GAN upscalers can smooth fine fabric texture; blend a little Lanczos back in.
-    lz = cv2.resize(src, (sr.shape[1], sr.shape[0]), interpolation=cv2.INTER_LANCZOS4).astype(np.float32)
-    out = sr * (1 - args.texture) + lz * args.texture
-    # Gentle unsharp mask for crisp print edges.
-    out = out + 0.35 * (out - cv2.GaussianBlur(out, (0, 0), 2.0))
-    out = np.clip(out, 0, 255).astype(np.uint8)
+        # GAN upscalers can smooth fine fabric texture; blend a little Lanczos back in.
+        lz = cv2.resize(src, (sr.shape[1], sr.shape[0]), interpolation=cv2.INTER_LANCZOS4).astype(np.float32)
+        out = sr * (1 - args.texture) + lz * args.texture
+        # Gentle unsharp mask for crisp print edges.
+        out = out + 0.35 * (out - cv2.GaussianBlur(out, (0, 0), 2.0))
+        out = np.clip(out, 0, 255).astype(np.uint8)
+        if args.save_base:
+            cv2.imwrite(args.save_base, out)
+
+    # Re-place all small text from the artwork at 4x (alignment is found on the
+    # original, uncorrected mockup, whose print it snaps to).
+    placed = fix_mockup.align_all(cv2.imread(os.path.join(fix_mockup.IN, "mockup.jpg")))
+    out = fix_mockup.render(out, placed, scale=4)
 
     d = os.path.dirname(args.inp)
     cv2.imwrite(os.path.join(d, "dryp_mockup_fixed_4x.png"), out)

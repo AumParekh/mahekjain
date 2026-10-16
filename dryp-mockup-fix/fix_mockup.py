@@ -16,6 +16,12 @@ OUT = os.path.join(HERE, "output")
 
 # Regions in flat-artwork pixel coords (x0, y0, x1, y1). `kind` is the ink
 # polarity on the artwork: "dark" ink on a light ground, or "light" ink.
+# Options: snap=False skips the snap-to-old-text search; hires=True marks text
+# that is already spelled right in the photo and is only re-placed on upscaled
+# output (AI upscalers invent letters in small text). Hi-res-only lines go last
+# so they never influence the alignment of the real fixes.
+NOSNAP = {"snap": False}
+HIRES = {"hires": True}
 BAGS = {
     "hazelnut": {
         "art": "art_hazelnut_drift.jpg",
@@ -23,7 +29,7 @@ BAGS = {
         "regions": [
             # Mostly hidden past the bag's folded edge, so too little old text
             # is visible to snap to; the bag-wide fit places it correctly.
-            ("small_batch", (95, 112, 312, 156), "dark", False),
+            ("small_batch", (95, 112, 312, 156), "dark", NOSNAP),
             ("roasted_in_india", (935, 112, 1235, 156), "dark"),
             ("badge", (982, 668, 1192, 878), "dark"),
             ("subline", (370, 1712, 960, 1756), "dark"),
@@ -31,6 +37,7 @@ BAGS = {
             ("roast_label", (560, 1882, 655, 1924), "dark"),
             ("arabica", (960, 1880, 1175, 1924), "dark"),
             ("net_wt", (95, 1880, 330, 1924), "dark"),
+            ("tagline", (465, 618, 868, 664), "dark", HIRES),
         ],
     },
     "slow_pour": {
@@ -40,6 +47,11 @@ BAGS = {
             ("roasted_in_india", (935, 112, 1235, 156), "light"),
             ("badge", (982, 668, 1192, 878), "dark"),
             ("notes", (418, 1764, 915, 1820), "light"),
+            ("small_batch", (95, 112, 312, 156), "light", HIRES),
+            ("tagline", (465, 618, 868, 664), "light", HIRES),
+            ("subline", (412, 1712, 918, 1756), "light", HIRES),
+            ("roast_label", (560, 1882, 655, 1924), "light", HIRES),
+            ("arabica", (960, 1880, 1175, 1924), "light", HIRES),
         ],
     },
 }
@@ -166,12 +178,12 @@ def best_fit(art_gray, photo_gray, inits, box, max_shift=12):
     return best
 
 
-def strip_ink(patch, kind, k):
+def strip_ink(patch, kind, k, sigma=1.2):
     """Remove thin text strokes, keeping the bag's broad shading/wrinkles."""
     ker = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))
     op = cv2.MORPH_CLOSE if kind == "dark" else cv2.MORPH_OPEN
     bg = cv2.morphologyEx(patch, op, ker)
-    return cv2.GaussianBlur(bg, (0, 0), 1.2)
+    return cv2.GaussianBlur(bg, (0, 0), sigma)
 
 
 def art_alpha(crop_gray, kind):
@@ -181,15 +193,19 @@ def art_alpha(crop_gray, kind):
     return np.clip((a - 0.1) / 0.8, 0, 1)
 
 
-def fix_region(photo, photo_gray, art_gray, Hfull, bb, box, kind, is_badge):
-    bx0, by0, bx1, by1 = bb
+def fix_region(photo, art_gray, Hfull, bb, box, kind, is_badge, scale=1):
+    """Composite the artwork text into `photo`, which is the mockup at `scale`x."""
+    sc = scale
+    bx0, by0, bx1, by1 = (v * sc for v in bb)
     x0, y0, x1, y1 = box
-    Hl = translate(-bx0, -by0) @ Hfull @ translate(x0, y0)
+    Hl = translate(-bx0, -by0) @ np.diag([sc, sc, 1.0]) @ Hfull @ translate(x0, y0)
     w, h = bx1 - bx0, by1 - by0
     patch = photo[by0:by1, bx0:bx1].astype(np.float32)
+    odd = lambda n: int(n) | 1
 
-    # New ink alpha from the artwork, pre-blurred against aliasing at ~1/3 scale.
-    crop = cv2.GaussianBlur(art_gray[y0:y1, x0:x1], (0, 0), 1.1)
+    # New ink alpha from the artwork. At 1x it is shrunk ~3x, so pre-blur against
+    # aliasing; upscaled output enlarges it slightly, so keep it crisp.
+    crop = cv2.GaussianBlur(art_gray[y0:y1, x0:x1], (0, 0), 1.1 if sc == 1 else 0.5)
     alpha_art = art_alpha(crop, kind)
     region = np.ones_like(alpha_art)
     if is_badge:
@@ -197,16 +213,16 @@ def fix_region(photo, photo_gray, art_gray, Hfull, bb, box, kind, is_badge):
         r = np.hypot(xx - BADGE_CENTER[0], yy - BADGE_CENTER[1])
         alpha_art *= (r < BADGE_R - 4)
         region = (r < BADGE_R - 2).astype(np.float32)
-    alpha = cv2.warpPerspective(alpha_art, Hl, (w, h), flags=cv2.INTER_AREA)
+    flags = cv2.INTER_AREA if sc == 1 else cv2.INTER_LINEAR
+    alpha = cv2.warpPerspective(alpha_art, Hl, (w, h), flags=flags)
     region = cv2.warpPerspective(region, Hl, (w, h), flags=cv2.INTER_LINEAR)
     if not is_badge:  # let the cleanup reach old letters that overhang the new line
-        region = cv2.dilate(region, np.ones((9, 9), np.uint8))
-    alpha = cv2.GaussianBlur(alpha, (0, 0), 0.45)
+        region = cv2.dilate(region, np.ones((odd(9 * sc),) * 2, np.uint8))
+    alpha = cv2.GaussianBlur(alpha, (0, 0), 0.45 * sc ** 0.5)
 
     # Clean ground (old text removed); ink colour sampled from the old letters'
     # strongest pixels, then shaded with the ground so it follows the lighting.
-    k = 9 if is_badge else 7
-    bg = strip_ink(patch, kind, k)
+    bg = strip_ink(patch, kind, odd((9 if is_badge else 7) * sc), 1.2 * sc)
     diff = np.abs(patch - bg).sum(axis=2)
     inside = region > 0.5
     old_ink = (diff > np.percentile(diff[inside], 85)) & inside
@@ -216,56 +232,69 @@ def fix_region(photo, photo_gray, art_gray, Hfull, bb, box, kind, is_badge):
     ink = np.median(patch[core] - shade[core], axis=0) + shade
 
     # Only touch bag pixels: skip fingers/shirt where the photo is far from the ground colour.
-    ground = np.median(bg[region > 0.5], axis=0)
-    on_bag = (np.linalg.norm(bg - ground, axis=2) < 45).astype(np.float32)
-    on_bag = cv2.erode(on_bag, np.ones((3, 3), np.uint8))
-    on_bag = cv2.GaussianBlur(on_bag, (0, 0), 1.0)
+    ground = np.median(bg[inside], axis=0)
+    surf = bg
+    if sc > 1:  # upscaler smears can survive strip_ink as small blobs; fingers are far bigger
+        surf = cv2.medianBlur(np.clip(bg, 0, 255).astype(np.uint8), odd(15 * sc)).astype(np.float32)
+    on_bag = (np.linalg.norm(surf - ground, axis=2) < 45).astype(np.float32)
+    on_bag = cv2.erode(on_bag, np.ones((odd(3 * sc),) * 2, np.uint8))
+    on_bag = cv2.GaussianBlur(on_bag, (0, 0), 1.0 * sc)
 
     # Feathered replacement area around the text (dilated old+new ink).
     area = ((alpha > 0.05) | old_ink).astype(np.uint8)
-    area = cv2.dilate(area, np.ones((5, 5), np.uint8)).astype(np.float32)
-    area = cv2.GaussianBlur(area, (0, 0), 1.5) * region * on_bag
+    area = cv2.dilate(area, np.ones((odd(5 * sc),) * 2, np.uint8)).astype(np.float32)
+    area = cv2.GaussianBlur(area, (0, 0), 1.5 * sc) * region * on_bag
 
     a = alpha[..., None]
     new = bg * (1 - a) + ink * a
-    noise = np.random.default_rng(7).normal(0, 2.0, new.shape).astype(np.float32)
+    noise = np.random.default_rng(7).normal(0, 2.0 if sc == 1 else 1.0, new.shape).astype(np.float32)
     new += noise * area[..., None]
     out = patch * (1 - area[..., None]) + new * area[..., None]
     photo[by0:by1, bx0:bx1] = np.clip(out, 0, 255)
 
 
-def main():
-    os.makedirs(OUT, exist_ok=True)
-    photo = cv2.imread(os.path.join(IN, "mockup.jpg"))
-    orig = photo.copy()
+def align_all(photo):
+    """Locate every region on the original mockup. Returns a list of dicts."""
     photo_gray = cv2.cvtColor(photo, cv2.COLOR_BGR2GRAY)
-    work = photo.astype(np.float32)
-    boxes = []
+    placed = []
     for bag, cfg in BAGS.items():
-        art = cv2.imread(os.path.join(IN, cfg["art"]))
-        art_gray = cv2.cvtColor(art, cv2.COLOR_BGR2GRAY)
+        art_gray = cv2.cvtColor(cv2.imread(os.path.join(IN, cfg["art"])), cv2.COLOR_BGR2GRAY)
         H, matches = global_homography(art_gray, photo_gray, cfg["roi"])
         done = []  # (box centre, refined H) of regions ECC locked onto
         for name, box, kind, *opt in cfg["regions"]:
+            opt = opt[0] if opt else {}
             c = np.array([(box[0] + box[2]) / 2, (box[1] + box[3]) / 2])
             # Neighbouring locked-in warps are good starts too.
             near = [h for _, h in sorted(done, key=lambda d: np.linalg.norm(d[0] - c))[:2]]
             inits = [local_homography(matches, box, H), H] + near
-            if name != "badge" and opt != [False]:
+            if name != "badge" and opt.get("snap", True):
                 inits = [snap_to_old_text(art_gray, photo_gray, h, box, kind) for h in inits]
             Hfull, bb, cc = best_fit(art_gray, photo_gray, inits, box, max_shift=6)
             if cc is not None and cc > 0.5:
                 done.append((c, Hfull))
-            fix_region(work, photo_gray, art_gray, Hfull, bb, box, kind, name == "badge")
-            boxes.append((f"{bag}/{name}", bb))
+            placed.append(dict(label=f"{bag}/{name}", art_gray=art_gray, H=Hfull, bb=bb, box=box,
+                               kind=kind, badge=name == "badge", hires=opt.get("hires", False)))
             print(f"{bag:10s} {name:18s} ecc={cc}")
-    result = np.clip(work, 0, 255).astype(np.uint8)
-    cv2.imwrite(os.path.join(OUT, "dryp_mockup_fixed.png"), result)
+    return placed
 
-    # 2x Lanczos upscale with a gentle unsharp mask for a crisper deliverable.
-    up = cv2.resize(result, None, fx=2, fy=2, interpolation=cv2.INTER_LANCZOS4).astype(np.float32)
-    up = up + 0.6 * (up - cv2.GaussianBlur(up, (0, 0), 1.6))
-    cv2.imwrite(os.path.join(OUT, "dryp_mockup_fixed_2x.png"), np.clip(up, 0, 255).astype(np.uint8))
+
+def render(img, placed, scale=1):
+    """Apply the placed text to `img` (the mockup at `scale`x); returns uint8."""
+    work = img.astype(np.float32)
+    for p in placed:
+        if p["hires"] and scale == 1:
+            continue
+        fix_region(work, p["art_gray"], p["H"], p["bb"], p["box"], p["kind"], p["badge"], scale)
+    return np.clip(work, 0, 255).astype(np.uint8)
+
+
+def main():
+    os.makedirs(OUT, exist_ok=True)
+    orig = cv2.imread(os.path.join(IN, "mockup.jpg"))
+    placed = align_all(orig)
+    result = render(orig, placed)
+    cv2.imwrite(os.path.join(OUT, "dryp_mockup_fixed.png"), result)
+    boxes = [(p["label"], p["bb"]) for p in placed if not p["hires"]]
 
     # Before/after sheet: full images side by side, then zoomed crops per fix.
     sheet = [np.hstack([orig, result])]
