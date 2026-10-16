@@ -133,6 +133,7 @@ def main():
 
     d = os.path.dirname(args.inp)
     cv2.imwrite(os.path.join(d, "dryp_mockup_fixed_4x.png"), out)
+    cv2.imwrite(os.path.join(d, "dryp_mockup_fixed_4x.jpg"), out, [cv2.IMWRITE_JPEG_QUALITY, 95])
     half = cv2.resize(out, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
     cv2.imwrite(os.path.join(d, "dryp_mockup_fixed_2x.png"), half)
     print("wrote", out.shape[1], "x", out.shape[0])
